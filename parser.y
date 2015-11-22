@@ -66,7 +66,6 @@ enum {
   char *as_str;
   int as_func;
   node *as_ast;
-  std::vector<node*>* as_node_list;
 }
 
 %token          FLOAT_T
@@ -104,15 +103,15 @@ enum {
 // TODO: fill this out
 %type <as_ast> program
 %type <as_ast> scope
-%type <as_node_list> declarations
-%type <as_node_list> statements
+%type <as_ast> declarations
+%type <as_ast> statements
 %type <as_ast> declaration
 %type <as_ast> statement
 %type <as_ast> type
 %type <as_ast> variable
 %type <as_ast> expression
-%type <as_node_list> arguments_opt
-%type <as_node_list> arguments
+%type <as_ast> arguments_opt
+%type <as_ast> arguments
 // expect one shift/reduce conflict, where Bison chooses to shift
 // the ELSE.
 %expect 1
@@ -131,7 +130,7 @@ enum {
 program
   : scope 
       { 
-            $$ = ast_allocate(PROGRAM, $1);
+            ast  = ast_allocate(PROGRAM, $1);
             yTRACE("program -> scope\n") 
       } 
   ;
@@ -147,13 +146,12 @@ scope
 declarations
   : declarations declaration
       {
-        $$ = $1;
-        $1->push_back($2);
+        $$ = ast_allocate(NODE_LIST, $1, $2);
          yTRACE("declarations -> declarations declaration\n") 
       }
   | 
       {
-        $$ = new std::vector<node*>();
+        $$ = ast_allocate(NODE_LIST, NULL, NULL);
          yTRACE("declarations -> \n") 
       }
   ;
@@ -161,13 +159,12 @@ declarations
 statements
   : statements statement
       { 
-        $$ = $1;
-        $1->push_back($2);
+        $$ = ast_allocate(NODE_LIST, $1, $2);
         yTRACE("statements -> statements statement\n")
        }
   | 
       {
-        $$ = new std::vector<node*>();
+        $$ = ast_allocate(NODE_LIST, NULL, NULL);
          yTRACE("statements -> \n") 
       }
   ;
@@ -344,7 +341,9 @@ expression
 
   /* misc */
   | '(' expression ')'
-      { yTRACE("expression -> ( expression ) \n") }
+      { 
+        $$ = $2;
+        yTRACE("expression -> ( expression ) \n") }
   | variable
     { 
         $$ = $1;
@@ -365,12 +364,11 @@ variable
 arguments
   : arguments ',' expression
       { 
-        $$ = $1;
-        $1->push_back($3);
+        $$ = ast_allocate(NODE_LIST, $1, $3);
         yTRACE("arguments -> arguments , expression \n") }
   | expression
       { 
-        $$ = new std::vector<node*>();
+        $$ = ast_allocate(NODE_LIST, NULL, $1);
         yTRACE("arguments -> expression \n") }
   ;
 

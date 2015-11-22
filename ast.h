@@ -3,7 +3,6 @@
 #define AST_H_ 1
 
 #include <stdarg.h>
-#include <vector>
 
 // Dummy node just so everything compiles, create your own node/nodes
 //
@@ -23,7 +22,7 @@ typedef enum {
   UNKNOWN,    
 
   PROGRAM,
-  
+  NODE_LIST,  
 
   EXPRESSIONS,
   EXPRESSION,
@@ -86,10 +85,15 @@ struct node_ {
     } program;
 
     struct{
-        std::vector<node*>* declarations;
-        std::vector<node*>* statements;
+        node* declarations;
+        node* statements;
     } scope;
-    
+
+    struct{
+        node* payload;
+        node* next_node;
+    } node_list;
+
     struct{
         node* type;
         char* id;
@@ -114,12 +118,12 @@ struct node_ {
     
     struct{
         node* type;
-        std::vector<node*>* args;
+        node* args;
     } expression_constructor;
 
     struct{
         int func;
-        std::vector<node*>* args;
+        node* args;
     } expression_func;
 
 
@@ -141,7 +145,9 @@ struct node_ {
     } expression_int_c;
 
     struct{
-      float value;
+      double value; //when using va_arg, float is promoted to double
+                    //we must accept a double type as value or the program will
+                    //crash
     } expression_float_c;
     
     struct{

@@ -28,8 +28,13 @@ node *ast_allocate(node_kind kind, ...) {
           break;
 
       case SCOPE:
-          ast->scope.declarations = va_arg(args, std::vector<node*>*);
-          ast->scope.statements = va_arg(args, std::vector<node*>*);
+          ast->scope.declarations = va_arg(args, node*);
+          ast->scope.statements = va_arg(args, node*);
+          break;
+
+      case NODE_LIST:
+          ast->node_list.next_node = va_arg(args, node*);
+          ast->node_list.payload = va_arg(args, node*);
           break;
 
       case DECLARATION:
@@ -61,12 +66,12 @@ node *ast_allocate(node_kind kind, ...) {
 
       case EXPRESSION_CONSTRUCTOR:
           ast->expression_constructor.type = va_arg(args, node*);
-          ast->expression_constructor.args = va_arg(args, std::vector<node*>*);
+          ast->expression_constructor.args = va_arg(args, node*);
           break;
 
       case EXPRESSION_FUNC:
           ast->expression_func.func = va_arg(args, int);
-          ast->expression_func.args = va_arg(args, std::vector<node*>*);
+          ast->expression_func.args = va_arg(args, node*);
           break;
 
       case EXPRESSION_UNARY_A:
@@ -99,7 +104,7 @@ node *ast_allocate(node_kind kind, ...) {
           ast->expression_int_c.value = va_arg(args, int);
           break;
       case EXPRESSION_FLOAT_C:
-          ast->expression_float_c.value = va_arg(args, float);
+          ast->expression_float_c.value = va_arg(args, double);
           break;
 
       case EXPRESSION_VARIABLE:
@@ -123,6 +128,8 @@ void ast_free(node *ast) {
 }
 
 void node_next(node* ast, void (*visitor)(node* n)){
+    if (ast == NULL) 
+        return;
     node_kind kind = ast->kind;
      switch (kind){
     
@@ -131,13 +138,18 @@ void node_next(node* ast, void (*visitor)(node* n)){
           break;
 
       case SCOPE:
-          for (std::vector<node*>::iterator it = ast->scope.declarations->begin(); it!=ast->scope.declarations->end();++it){
-              visitor(*it);
-          }
-          for (std::vector<node*>::iterator it = ast->scope.statements->begin(); it!=ast->scope.statements->end();++it){
-              visitor(*it);
-          }
+          visitor(ast->scope.declarations);
+          visitor(ast->scope.statements);
           break;
+
+      case NODE_LIST:
+          if (ast->node_list.payload!=NULL){
+              visitor(ast->node_list.payload);
+           }
+          if (ast->node_list.next_node !=NULL){
+              visitor(ast->node_list.next_node);
+           }
+           break;
 
       case DECLARATION:
           visitor(ast->declaration.type);
@@ -165,15 +177,11 @@ void node_next(node* ast, void (*visitor)(node* n)){
 
       case EXPRESSION_CONSTRUCTOR:
           visitor(ast->expression_constructor.type);
-          for (std::vector<node*>::iterator it = ast->expression_constructor.args->begin(); it!=ast->expression_constructor.args->end();++it){
-              visitor(*it);
-          }
+          visitor(ast->expression_constructor.args);
           break;
 
       case EXPRESSION_FUNC:
-          for (std::vector<node*>::iterator it = ast->expression_func.args->begin(); it!=ast->expression_func.args->end();++it){
-              visitor(*it);
-          }
+          visitor(ast->expression_func.args);
           break;
 
       case EXPRESSION_UNARY_A:
@@ -213,6 +221,9 @@ void node_next(node* ast, void (*visitor)(node* n)){
 
 
 void print_action(node * ast) {
+    if (ast == NULL)
+        return;
+
     node_kind kind = ast->kind;
     switch (kind){
     
