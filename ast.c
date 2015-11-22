@@ -211,7 +211,7 @@ void ast_print(node * ast) {
 
     int i = 0;
     for (i = 0; i < print_level; i ++){
-       printf("    ");
+       //printf("    ");
     }
 
     switch(kind){
@@ -222,52 +222,52 @@ void ast_print(node * ast) {
     
       // scope
       case SCOPE:
-          printf("( SCOPE ");
+          printf("( SCOPE \n");
           print_level++;
           ast_print(ast->scope.declarations);
           ast_print(ast->scope.statements);
           print_level--;
-          printf(")");
+          printf(")\n");
           break;
     
       // declarations
       case DECLARATIONS: // includes null
-          printf("( DECLARATIONS ");
+          printf("( DECLARATIONS \n");
           ast_print(ast->declarations.declarations);
           ast_print(ast->declarations.declaration);
-          printf(")");
+          printf(")\n");
           break;
     
       // statements:
       case STATEMENTS: // includes null
-          printf("( STATEMENTS ");
+          printf("( STATEMENTS \n");
           ast_print(ast->statements.statements );
           ast_print(ast->statements.statement );
-          printf(")");
+          printf(")\n");
           break;
     
       // declaration
       case DECLARATION:
-          printf("( DECLARATION ");
+          printf("( DECLARATION \n");
           printf(" ID=%s ", ast->declaration.id);
           ast_print(ast->declaration.type );
-          printf(")");
+          printf(")\n");
           break;
 
       case INITIALIZED_DECLARATION:
-          printf("( DECLARATION ");
+          printf("( DECLARATION \n");
           printf(" ID=%s ", ast->declaration.id);
           ast_print(ast->initialized_declaration.type );
           ast_print(ast->initialized_declaration.expression );
-          printf(")");
+          printf(")\n");
           break;
 
       case CONST_DECLARATION:
-          printf("( DECLARATION ");
+          printf("( DECLARATION \n");
           printf(" ID=%s ", ast->declaration.id);
           ast_print(ast->const_declaration.type );
           ast_print(ast->const_declaration.expression );
-          printf(")");
+          printf(")\n");
           break;
     
       // statement
@@ -310,7 +310,7 @@ void ast_print(node * ast) {
       case FUNC_EXPRESSION_NODE:
           printf("( CALL %s ", get_func(ast->func_expression_node.func_name));
           ast_print(ast->func_expression_node.arguments_opt );
-          printf(")");
+          printf(")\n");
           break;
 
       case TYPE_EXPRESSION_NODE:
@@ -450,11 +450,11 @@ char *type_str(int type_code, int multiplicity){
             return "INT";
         case IVEC_TYPE:
             switch(multiplicity){
-                case 2:
+                case 1:
                     return "IVEC2";
-                case 3:
+                case 2:
                     return "IVEC3";
-                case 4:
+                case 3:
                     return "IVEC4";
                 default: 
                     return "IVEC?";
@@ -463,11 +463,11 @@ char *type_str(int type_code, int multiplicity){
             return "BOOL";
         case BVEC_TYPE:
             switch(multiplicity){
-                case 2:
+                case 1:
                     return "BVEC2";
-                case 3:
+                case 2:
                     return "BVEC3";
-                case 4:
+                case 3:
                     return "BVEC4";
                 default: 
                     return "BVEC?";
@@ -476,11 +476,11 @@ char *type_str(int type_code, int multiplicity){
             return "FLOAT";
         case VEC_TYPE:
             switch(multiplicity){
-                case 2:
+                case 1:
                     return "VEC2";
-                case 3:
+                case 2:
                     return "VEC3";
-                case 4:
+                case 3:
                     return "VEC4";
                 default: 
                     return "VEC?";
