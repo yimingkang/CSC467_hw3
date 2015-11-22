@@ -124,7 +124,7 @@ node *ast_allocate(node_kind kind, ...) {
 
       case LITERAL_EXPRESSION_NODE:
           ast->literal_expression_node.literal_type = va_arg(args, int);
-          switch (va_arg(args, int)){
+          switch (ast->literal_expression_node.literal_type){
               case INT_LITERAL:
                   ast->literal_expression_node.literal_value.int_val = va_arg(args, int);
                   break;
@@ -139,7 +139,7 @@ node *ast_allocate(node_kind kind, ...) {
 
               default:
                   //ERROR
-                  printf("!!!!!STOP, unrecognized literal in LITERAL_EXPRESSION_NODE");
+                  printf("!!!!!STOP, unrecognized literal in LITERAL_EXPRESSION_NODE\n");
           }
           break;
     
@@ -176,7 +176,7 @@ node *ast_allocate(node_kind kind, ...) {
     
       case UNKNOWN:
       default:
-        printf("!!!!!STOP, unknown type!");
+        printf("!!!!!STOP, unknown type!\n");
         break;
   }
 
@@ -190,6 +190,4 @@ void ast_free(node *ast) {
 }
 
 void ast_print(node * ast) {
-    printf("TEST");
-
 }
