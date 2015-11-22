@@ -62,7 +62,7 @@ typedef enum{
 typedef enum {
 
   // program
-  PROGRAM,
+  PROGRAM,   // 0
 
   // scope
   SCOPE,
@@ -75,21 +75,21 @@ typedef enum {
 
   // declaration
   DECLARATION,
-  INITIALIZED_DECLARATION,
+  INITIALIZED_DECLARATION, //5
   CONST_DECLARATION,
 
   // statement
   ASSIGNMENT_STATEMENT,
   IF_ELSE_STATEMENT,
   IF_STATEMENT,
-  SCOPE_STATEMENT,
+  SCOPE_STATEMENT,  // 10
   SEMICOLEN_STATEMENT,
 
   // Expression
-  FUNC_EXPRESSION_NODE       ,
-  TYPE_EXPRESSION_NODE       ,
-  BINARY_EXPRESSION_NODE       ,
-  UNARY_EXPRESSION_NODE       ,
+  FUNC_EXPRESSION_NODE,
+  TYPE_EXPRESSION_NODE,
+  BINARY_EXPRESSION_NODE,
+  UNARY_EXPRESSION_NODE,  // 15
   PAREN_EXPRESSION_NODE,
   VARIABLE_EXPRESSION_NODE,
   LITERAL_EXPRESSION_NODE,
@@ -181,7 +181,7 @@ struct node_ {
     } semicolen_statement;
 
     struct {
-      int type;
+      int var_type;
       int multiplicity;
     } type;
 
@@ -200,7 +200,7 @@ struct node_ {
     } type_expression_node;
 
     struct {
-      char *func_name;
+      int func_name;
       node *arguments_opt;
     } func_expression_node;
 

@@ -369,7 +369,7 @@ expression
       $$ = ast_allocate(PAREN_EXPRESSION_NODE, $2);
       yTRACE("expression -> ( expression ) \n") 
       }
-  | variable { }
+  | variable
     {
     $$ = ast_allocate(VARIABLE_EXPRESSION_NODE, $1);
     yTRACE("expression -> variable \n") 

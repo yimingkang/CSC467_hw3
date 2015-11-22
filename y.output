@@ -1,4 +1,4 @@
-State 89 conflicts: 1 shift/reduce
+State 88 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -54,19 +54,16 @@ Grammar
    40           | INT_C
    41           | FLOAT_C
    42           | '(' expression ')'
+   43           | variable
 
-   43 @1: /* empty */
+   44 variable: ID
+   45         | ID '[' INT_C ']'
 
-   44 expression: variable @1
+   46 arguments: arguments ',' expression
+   47          | expression
 
-   45 variable: ID
-   46         | ID '[' INT_C ']'
-
-   47 arguments: arguments ',' expression
-   48          | expression
-
-   49 arguments_opt: arguments
-   50              | /* empty */
+   48 arguments_opt: arguments
+   49              | /* empty */
 
 
 Terminals, with rules where they appear
@@ -77,15 +74,15 @@ $end (0) 0
 ')' (41) 11 12 21 22 42
 '*' (42) 35
 '+' (43) 33
-',' (44) 47
+',' (44) 46
 '-' (45) 23 34
 '/' (47) 36
 ';' (59) 7 8 9 10 14
 '<' (60) 29
 '=' (61) 8 9 10
 '>' (62) 31
-'[' (91) 46
-']' (93) 46
+'[' (91) 45
+']' (93) 45
 '^' (94) 37
 '{' (123) 2
 '}' (125) 2
@@ -109,8 +106,8 @@ VEC_T (273) 20
 BVEC_T (274) 18
 IVEC_T (275) 16
 FLOAT_C (276) 41
-INT_C (277) 40 46
-ID (278) 7 8 9 45 46
+INT_C (277) 40 45
+ID (278) 7 8 9 44 45
 UMINUS (279)
 WITHOUT_ELSE (280)
 WITH_ELSE (281)
@@ -136,16 +133,14 @@ type (51)
     on left: 15 16 17 18 19 20, on right: 7 8 9 21
 expression (52)
     on left: 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38
-    39 40 41 42 44, on right: 8 9 10 11 12 23 24 25 26 27 28 29 30
-    31 32 33 34 35 36 37 42 47 48
-@1 (53)
-    on left: 43, on right: 44
-variable (54)
-    on left: 45 46, on right: 10 44
-arguments (55)
-    on left: 47 48, on right: 47 49
-arguments_opt (56)
-    on left: 49 50, on right: 21 22
+    39 40 41 42 43, on right: 8 9 10 11 12 23 24 25 26 27 28 29 30
+    31 32 33 34 35 36 37 42 46 47
+variable (53)
+    on left: 44 45, on right: 10 43
+arguments (54)
+    on left: 46 47, on right: 46 48
+arguments_opt (55)
+    on left: 48 49, on right: 21 22
 
 
 state 0
@@ -312,12 +307,12 @@ state 17
 
 state 18
 
-   45 variable: ID .
-   46         | ID . '[' INT_C ']'
+   44 variable: ID .
+   45         | ID . '[' INT_C ']'
 
     '['  shift, and go to state 27
 
-    $default  reduce using rule 45 (variable)
+    $default  reduce using rule 44 (variable)
 
 
 state 19
@@ -399,7 +394,7 @@ state 26
 
 state 27
 
-   46 variable: ID '[' . INT_C ']'
+   45 variable: ID '[' . INT_C ']'
 
     INT_C  shift, and go to state 43
 
@@ -639,18 +634,16 @@ state 41
 
 state 42
 
-   44 expression: variable . @1
+   43 expression: variable .
 
-    $default  reduce using rule 43 (@1)
-
-    @1  go to state 66
+    $default  reduce using rule 43 (expression)
 
 
 state 43
 
-   46 variable: ID '[' INT_C . ']'
+   45 variable: ID '[' INT_C . ']'
 
-    ']'  shift, and go to state 67
+    ']'  shift, and go to state 66
 
 
 state 44
@@ -683,7 +676,7 @@ state 44
     '*'  shift, and go to state 62
     '/'  shift, and go to state 63
     '^'  shift, and go to state 64
-    ';'  shift, and go to state 68
+    ';'  shift, and go to state 67
 
 
 state 45
@@ -716,7 +709,7 @@ state 45
     '*'  shift, and go to state 62
     '/'  shift, and go to state 63
     '^'  shift, and go to state 64
-    ';'  shift, and go to state 69
+    ';'  shift, and go to state 68
 
 
 state 46
@@ -749,7 +742,7 @@ state 46
     '*'  shift, and go to state 62
     '/'  shift, and go to state 63
     '^'  shift, and go to state 64
-    ';'  shift, and go to state 70
+    ';'  shift, and go to state 69
 
 
 state 47
@@ -772,13 +765,13 @@ state 47
     '!'      shift, and go to state 38
     '('      shift, and go to state 39
 
-    $default  reduce using rule 50 (arguments_opt)
+    $default  reduce using rule 49 (arguments_opt)
 
     type           go to state 40
-    expression     go to state 71
+    expression     go to state 70
     variable       go to state 42
-    arguments      go to state 72
-    arguments_opt  go to state 73
+    arguments      go to state 71
+    arguments_opt  go to state 72
 
 
 state 48
@@ -851,7 +844,7 @@ state 50
     '*'  shift, and go to state 62
     '/'  shift, and go to state 63
     '^'  shift, and go to state 64
-    ')'  shift, and go to state 74
+    ')'  shift, and go to state 73
 
 
 state 51
@@ -874,13 +867,13 @@ state 51
     '!'      shift, and go to state 38
     '('      shift, and go to state 39
 
-    $default  reduce using rule 50 (arguments_opt)
+    $default  reduce using rule 49 (arguments_opt)
 
     type           go to state 40
-    expression     go to state 71
+    expression     go to state 70
     variable       go to state 42
-    arguments      go to state 72
-    arguments_opt  go to state 75
+    arguments      go to state 71
+    arguments_opt  go to state 74
 
 
 state 52
@@ -904,7 +897,7 @@ state 52
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 76
+    expression  go to state 75
     variable    go to state 42
 
 
@@ -929,7 +922,7 @@ state 53
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 77
+    expression  go to state 76
     variable    go to state 42
 
 
@@ -954,7 +947,7 @@ state 54
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 78
+    expression  go to state 77
     variable    go to state 42
 
 
@@ -979,7 +972,7 @@ state 55
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 79
+    expression  go to state 78
     variable    go to state 42
 
 
@@ -1004,7 +997,7 @@ state 56
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 80
+    expression  go to state 79
     variable    go to state 42
 
 
@@ -1029,7 +1022,7 @@ state 57
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 81
+    expression  go to state 80
     variable    go to state 42
 
 
@@ -1054,7 +1047,7 @@ state 58
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 82
+    expression  go to state 81
     variable    go to state 42
 
 
@@ -1079,7 +1072,7 @@ state 59
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 83
+    expression  go to state 82
     variable    go to state 42
 
 
@@ -1104,7 +1097,7 @@ state 60
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 84
+    expression  go to state 83
     variable    go to state 42
 
 
@@ -1129,7 +1122,7 @@ state 61
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 85
+    expression  go to state 84
     variable    go to state 42
 
 
@@ -1154,7 +1147,7 @@ state 62
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 86
+    expression  go to state 85
     variable    go to state 42
 
 
@@ -1179,7 +1172,7 @@ state 63
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 87
+    expression  go to state 86
     variable    go to state 42
 
 
@@ -1204,7 +1197,7 @@ state 64
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 88
+    expression  go to state 87
     variable    go to state 42
 
 
@@ -1219,46 +1212,39 @@ state 65
     ';'  shift, and go to state 20
 
     scope      go to state 21
-    statement  go to state 89
+    statement  go to state 88
     variable   go to state 23
 
 
 state 66
 
-   44 expression: variable @1 .
+   45 variable: ID '[' INT_C ']' .
 
-    $default  reduce using rule 44 (expression)
+    $default  reduce using rule 45 (variable)
 
 
 state 67
-
-   46 variable: ID '[' INT_C ']' .
-
-    $default  reduce using rule 46 (variable)
-
-
-state 68
 
    10 statement: variable '=' expression ';' .
 
     $default  reduce using rule 10 (statement)
 
 
-state 69
+state 68
 
     8 declaration: type ID '=' expression ';' .
 
     $default  reduce using rule 8 (declaration)
 
 
-state 70
+state 69
 
     9 declaration: CONST type ID '=' expression ';' .
 
     $default  reduce using rule 9 (declaration)
 
 
-state 71
+state 70
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1273,7 +1259,7 @@ state 71
    35           | expression . '*' expression
    36           | expression . '/' expression
    37           | expression . '^' expression
-   48 arguments: expression .
+   47 arguments: expression .
 
     AND  shift, and go to state 52
     OR   shift, and go to state 53
@@ -1289,41 +1275,41 @@ state 71
     '/'  shift, and go to state 63
     '^'  shift, and go to state 64
 
-    $default  reduce using rule 48 (arguments)
+    $default  reduce using rule 47 (arguments)
+
+
+state 71
+
+   46 arguments: arguments . ',' expression
+   48 arguments_opt: arguments .
+
+    ','  shift, and go to state 89
+
+    $default  reduce using rule 48 (arguments_opt)
 
 
 state 72
 
-   47 arguments: arguments . ',' expression
-   49 arguments_opt: arguments .
+   22 expression: FUNC '(' arguments_opt . ')'
 
-    ','  shift, and go to state 90
-
-    $default  reduce using rule 49 (arguments_opt)
+    ')'  shift, and go to state 90
 
 
 state 73
-
-   22 expression: FUNC '(' arguments_opt . ')'
-
-    ')'  shift, and go to state 91
-
-
-state 74
 
    42 expression: '(' expression ')' .
 
     $default  reduce using rule 42 (expression)
 
 
-state 75
+state 74
 
    21 expression: type '(' arguments_opt . ')'
 
-    ')'  shift, and go to state 92
+    ')'  shift, and go to state 91
 
 
-state 76
+state 75
 
    25 expression: expression . AND expression
    25           | expression AND expression .
@@ -1355,7 +1341,7 @@ state 76
     $default  reduce using rule 25 (expression)
 
 
-state 77
+state 76
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1388,7 +1374,7 @@ state 77
     $default  reduce using rule 26 (expression)
 
 
-state 78
+state 77
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1414,7 +1400,7 @@ state 78
     $default  reduce using rule 28 (expression)
 
 
-state 79
+state 78
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1440,7 +1426,7 @@ state 79
     $default  reduce using rule 27 (expression)
 
 
-state 80
+state 79
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1466,7 +1452,7 @@ state 80
     $default  reduce using rule 30 (expression)
 
 
-state 81
+state 80
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1492,7 +1478,7 @@ state 81
     $default  reduce using rule 32 (expression)
 
 
-state 82
+state 81
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1518,7 +1504,7 @@ state 82
     $default  reduce using rule 29 (expression)
 
 
-state 83
+state 82
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1544,7 +1530,7 @@ state 83
     $default  reduce using rule 31 (expression)
 
 
-state 84
+state 83
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1568,7 +1554,7 @@ state 84
     $default  reduce using rule 33 (expression)
 
 
-state 85
+state 84
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1592,7 +1578,7 @@ state 85
     $default  reduce using rule 34 (expression)
 
 
-state 86
+state 85
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1614,7 +1600,7 @@ state 86
     $default  reduce using rule 35 (expression)
 
 
-state 87
+state 86
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1636,7 +1622,7 @@ state 87
     $default  reduce using rule 36 (expression)
 
 
-state 88
+state 87
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1658,20 +1644,20 @@ state 88
     $default  reduce using rule 37 (expression)
 
 
-state 89
+state 88
 
    11 statement: IF '(' expression ')' statement . ELSE statement
    12          | IF '(' expression ')' statement .
 
-    ELSE  shift, and go to state 93
+    ELSE  shift, and go to state 92
 
     ELSE      [reduce using rule 12 (statement)]
     $default  reduce using rule 12 (statement)
 
 
-state 90
+state 89
 
-   47 arguments: arguments ',' . expression
+   46 arguments: arguments ',' . expression
 
     FLOAT_T  shift, and go to state 6
     INT_T    shift, and go to state 7
@@ -1690,25 +1676,25 @@ state 90
     '('      shift, and go to state 39
 
     type        go to state 40
-    expression  go to state 94
+    expression  go to state 93
     variable    go to state 42
 
 
-state 91
+state 90
 
    22 expression: FUNC '(' arguments_opt ')' .
 
     $default  reduce using rule 22 (expression)
 
 
-state 92
+state 91
 
    21 expression: type '(' arguments_opt ')' .
 
     $default  reduce using rule 21 (expression)
 
 
-state 93
+state 92
 
    11 statement: IF '(' expression ')' statement ELSE . statement
 
@@ -1718,11 +1704,11 @@ state 93
     ';'  shift, and go to state 20
 
     scope      go to state 21
-    statement  go to state 95
+    statement  go to state 94
     variable   go to state 23
 
 
-state 94
+state 93
 
    25 expression: expression . AND expression
    26           | expression . OR expression
@@ -1737,7 +1723,7 @@ state 94
    35           | expression . '*' expression
    36           | expression . '/' expression
    37           | expression . '^' expression
-   47 arguments: arguments ',' expression .
+   46 arguments: arguments ',' expression .
 
     AND  shift, and go to state 52
     OR   shift, and go to state 53
@@ -1753,10 +1739,10 @@ state 94
     '/'  shift, and go to state 63
     '^'  shift, and go to state 64
 
-    $default  reduce using rule 47 (arguments)
+    $default  reduce using rule 46 (arguments)
 
 
-state 95
+state 94
 
    11 statement: IF '(' expression ')' statement ELSE statement .
 
