@@ -378,7 +378,9 @@ arguments_opt
         $$ = $1;
         yTRACE("arguments_opt -> arguments \n") }
   |
-      { yTRACE("arguments_opt -> \n") }
+      { 
+        $$ = ast_allocate(NODE_LIST, NULL, NULL);
+        yTRACE("arguments_opt -> \n") }
   ;
 
 %%

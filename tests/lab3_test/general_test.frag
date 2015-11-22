@@ -1,7 +1,7 @@
 {
         /*test declarations and variables using constants, and constructor*/
         int i_a = 1234;
-        bvec2 b_vec2 = bvec2(true, false);
+        bvec2 b_vec2 = bvec2();
         float f_a =1.0;
         float f_b = 1.0;
         float f_c;
@@ -24,7 +24,7 @@
             f_d = f_a * f_b + f_c / f_d;
         }else{
             f_d = 0;
-
+        }
 }
 
 
