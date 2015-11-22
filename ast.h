@@ -205,7 +205,7 @@ struct node_ {
     } binary_expression_node;
 
     struct {
-      node *type;
+      node *bool_int_float_type;  // can only be one of these types
     } literal_expression_node;
 
     struct {
@@ -222,16 +222,21 @@ struct node_ {
 
     struct {
       char *id;
-      node *type;
-      // TODO: figure out how do handle this situation
+      node *int_type;  // can only be int
     } array_variable;
 
     struct {
-    }
+      node *arguments;
+      node *expression;
+    } binary_arguments;
+
     struct {
-    }
+      node *expression;
+    } unary_expression;
+
     struct {
-    }
+      node *arguments;  // null -> epsilon
+    } arguments_opt;
   };
 };
 
