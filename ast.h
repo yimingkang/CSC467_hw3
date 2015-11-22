@@ -19,29 +19,29 @@ typedef struct node_ node;
 extern node *ast;
 
 typedef enum{
-  MINUS,
-  NEGATION,
+  UMINUS_OP,
+  UNEGATION_OP,
 } unary_op;
 
 typedef enum {
-  PLUS,
-  MINUS,
-  MULT,
-  DIV,
+  PLUS_OP,
+  MINUS_OP,
+  MULT_OP,
+  DIV_OP,
 
-  POW,
+  POW_OP,
 
-  GEQ,
-  GT,
+  GEQ_OP,
+  GT_OP,
 
-  LT,
-  LEQ,
+  LT_OP,
+  LEQ_OP,
 
-  NEQ,
-  EQ,
+  NEQ_OP,
+  EQ_OP,
 
-  AND,
-  OR,
+  AND_OP,
+  OR_OP,
 } binary_op;
 
 typedef enum{
@@ -53,23 +53,46 @@ typedef enum{
   VEC_TYPE,
 } type_name;
 
-typedef union{
-  int int_val;
-  float float_val;
-  char *char_val;
-  int bool_val;
-} type_value;
+typedef enum{
+  BOOL_LITERAL,
+  INT_LITERAL,
+  FLOAT_LITERAL,
+} literal_name;
 
 typedef enum {
+
+  // program
+  PROGRAM,
+
+  // scope
+  SCOPE,
+
+  // declarations
+  DECLARATIONS, // includes null
+
+  // statements,
+  STATEMENTS, // includes null
+
+  // declaration
+  DECLARATION,
+  INITIALIZED_DECLARATION,
+  CONST_DECLARATION,
+
+  // statement
+  ASSIGNMENT_STATEMENT,
+  IF_ELSE_STATEMENT,
+  IF_STATEMENT,
+  SCOPE_STATEMENT,
+  SEMICOLEN_STATEMENT,
 
   // Expression
   FUNC_EXPRESSION_NODE       ,
   TYPE_EXPRESSION_NODE       ,
   BINARY_EXPRESSION_NODE       ,
   UNARY_EXPRESSION_NODE       ,
-  LITERAL_EXPRESSION_NODE,
   PAREN_EXPRESSION_NODE,
   VARIABLE_EXPRESSION_NODE,
+  LITERAL_EXPRESSION_NODE,
 
   // variable
   SINGULAR_VARIABLE, 
@@ -85,30 +108,6 @@ typedef enum {
   // type
   TYPE,
 
-  // statement
-  ASSIGNMENT_STATEMENT,
-  IF_ELSE_STATEMENT,
-  IF_STATEMENT,
-  SCOPE_STATEMENT,
-  SEMICOLEN_STATEMENT,
-
-  // declaration
-  DECLARATION,
-  INITIALIZED_DECLARATION,
-  CONST_DECLARATION,
-
-  // statements,
-  STATEMENTS, // includes null
-
-  // declarations
-  DECLARATIONS, // includes null
-
-  // scope
-  SCOPE,
-
-  // program
-  PROGRAM,
-
   UNKNOWN               ,
 
 } node_kind;
@@ -120,14 +119,18 @@ struct node_ {
 
   union {
     struct {
+      node *scope;  
+    } program;
+
+    struct {
       node *declarations;
       node *statements;
       // null node -> both are null
     } scope;
 
     struct {
-      node *declaration;
       node *declarations;
+      node *declaration;
     } declarations;
 
     struct {
@@ -174,14 +177,22 @@ struct node_ {
     } scope_statement;
 
     struct {
-      char *null = NULL;
+      char *null;
     } semicolen_statement;
 
     struct {
-      type_name type;
-      type_value value;
+      int type;
       int multiplicity;
     } type;
+
+    struct {
+      int literal_type;
+      union {
+        int int_val;
+        float float_val;
+        int bool_val;
+      } literal_value;
+    } literal_expression_node;
 
     struct {
       node *type;
@@ -194,22 +205,18 @@ struct node_ {
     } func_expression_node;
 
     struct {
-      unary_op op;
+      int op;
       node *expression;
     } unary_expression_node;
 
     struct {
-      binary_op op;
+      int op;
       node *l_val;
       node *r_val;
     } binary_expression_node;
 
     struct {
-      node *bool_int_float_type;  // can only be one of these types
-    } literal_expression_node;
-
-    struct {
-      node *expressoin;
+      node *expression;
     } paren_expression_node;
 
     struct {
@@ -222,7 +229,7 @@ struct node_ {
 
     struct {
       char *id;
-      node *int_type;  // can only be int
+      int multiplicity;  // can only be int
     } array_variable;
 
     struct {
@@ -232,7 +239,7 @@ struct node_ {
 
     struct {
       node *expression;
-    } unary_expression;
+    } unary_argument;
 
     struct {
       node *arguments;  // null -> epsilon
