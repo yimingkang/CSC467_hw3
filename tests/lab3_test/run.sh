@@ -1,7 +1,7 @@
 #!/bin/bash
 echo ""
 for file in ./*.frag; do
-    ../../compiler467 -Tp "$file" > "$file".out 2>&1
+    ../../compiler467 -Da "$file" > "$file".out 2>&1
     DIFF=$(diff "$file".out "$file".target)
     if [ "$DIFF" != "" ] 
     then
