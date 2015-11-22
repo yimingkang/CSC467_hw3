@@ -1,0 +1,54 @@
+type -> VEC_T
+declaration -> type ID ';'
+declarations -> declarations declaration
+expression -> TRUE_C
+variable -> ID '[' INT_C ']' %prec '['
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+expression -> expression '*' expression %prec '*'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID '[' INT_C ']' %prec '['
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+expression -> expression '*' expression %prec '*'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID '[' INT_C ']' %prec '['
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID '[' INT_C ']' %prec '['
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+expression -> expression '*' expression %prec '*'
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+expression -> expression '*' expression %prec '*'
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+variable -> ID
+variable -> ID
+expression -> variable
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+statement -> IF '(' expression ')' statement ELSE statement %prec HIGH
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+program -> scope
