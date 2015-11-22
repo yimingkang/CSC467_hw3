@@ -18,28 +18,99 @@ struct node_;
 typedef struct node_ node;
 extern node *ast;
 
+typedef enum{
+  MINUS,
+  NEGATION,
+} unary_op;
+
 typedef enum {
-  UNKNOWN               = 0,
+  PLUS,
+  MINUS,
+  MULT,
+  DIV,
 
-  SCOPE_NODE            = (1 << 0),
-  
-  EXPRESSION_NODE       = (1 << 2),
-  UNARY_EXPRESION_NODE  = (1 << 2) | (1 << 3),
-  BINARY_EXPRESSION_NODE= (1 << 2) | (1 << 4),
-  INT_NODE              = (1 << 2) | (1 << 5), 
-  FLOAT_NODE            = (1 << 2) | (1 << 6),
-  IDENT_NODE            = (1 << 2) | (1 << 7),
-  VAR_NODE              = (1 << 2) | (1 << 8),
-  FUNCTION_NODE         = (1 << 2) | (1 << 9),
-  CONSTRUCTOR_NODE      = (1 << 2) | (1 << 10),
+  POW,
 
-  STATEMENT_NODE        = (1 << 1),
-  IF_STATEMENT_NODE     = (1 << 1) | (1 << 11),
-  WHILE_STATEMENT_NODE  = (1 << 1) | (1 << 12),
-  ASSIGNMENT_NODE       = (1 << 1) | (1 << 13),
-  NESTED_SCOPE_NODE     = (1 << 1) | (1 << 14),
+  GEQ,
+  GT,
 
-  DECLARATION_NODE      = (1 << 15)
+  LT,
+  LEQ,
+
+  NEQ,
+  EQ,
+
+  AND,
+  OR,
+} binary_op;
+
+typedef enum{
+  INT_TYPE,
+  IVEC_TYPE,
+  BOOL_TYPE,
+  BVEC_TYPE,
+  FLOAT_TYPE,
+  VEC_TYPE,
+} type_name;
+
+typedef union{
+  int int_val;
+  float float_val;
+  char *char_val;
+  int bool_val;
+} type_value;
+
+typedef enum {
+
+  // Expression
+  FUNC_EXPRESSION_NODE       ,
+  TYPE_EXPRESSION_NODE       ,
+  BINARY_EXPRESSION_NODE       ,
+  UNARY_EXPRESSION_NODE       ,
+  LITERAL_EXPRESSION_NODE,
+  PAREN_EXPRESSION_NODE,
+  VARIABLE_EXPRESSION_NODE,
+
+  // variable
+  SINGULAR_VARIABLE, 
+  ARRAY_VARIABLE,
+
+  // arguments
+  BINARY_ARGUMENT,
+  UNARY_ARGUMENT,
+
+  // argument_opt
+  ARGUMENT_OPT,
+
+  // type
+  TYPE,
+
+  // statement
+  ASSIGNMENT_STATEMENT,
+  IF_ELSE_STATEMENT,
+  IF_STATEMENT,
+  SCOPE_STATEMENT,
+  SEMICOLEN_STATEMENT,
+
+  // declaration
+  DECLARATION,
+  INITIALIZED_DECLARATION,
+  CONST_DECLARATION,
+
+  // statements,
+  STATEMENTS, // includes null
+
+  // declarations
+  DECLARATIONS, // includes null
+
+  // scope
+  SCOPE,
+
+  // program
+  PROGRAM,
+
+  UNKNOWN               ,
+
 } node_kind;
 
 struct node_ {
@@ -49,22 +120,118 @@ struct node_ {
 
   union {
     struct {
-      // declarations?
-      // statements?
+      node *declarations;
+      node *statements;
+      // null node -> both are null
     } scope;
-  
-    struct {
-      int op;
-      node *right;
-    } unary_expr;
 
     struct {
-      int op;
-      node *left;
-      node *right;
-    } binary_expr;
+      node *declaration;
+      node *declarations;
+    } declarations;
 
-    // etc.
+    struct {
+      node *statements;
+      node *statement;
+      // null node -> both are null
+    } statements;
+
+    struct {
+      node *type;
+      char *id;
+    } declaration;
+
+    struct {
+      node *type;
+      char *id;
+      node *expression;
+    } initialized_declaration;
+
+    struct {
+      node *type;
+      char *id;
+      node *expression;
+    } const_declaration;
+
+    struct {
+      node *variable;
+      node *expression;
+    } assignment_statement;
+
+    struct {
+      node *if_condition;
+      node *statement;
+      node *else_statement;
+    } if_else_statement;
+
+    struct {
+      node *if_condition;
+      node *statement;
+    } if_statement;
+
+    struct {
+      node *scope;
+    } scope_statement;
+
+    struct {
+      char *null = NULL;
+    } semicolen_statement;
+
+    struct {
+      type_name type;
+      type_value value;
+      int multiplicity;
+    } type;
+
+    struct {
+      node *type;
+      node *arguments_opt;
+    } type_expression_node;
+
+    struct {
+      char *func_name;
+      node *arguments_opt;
+    } func_expression_node;
+
+    struct {
+      unary_op op;
+      node *expression;
+    } unary_expression_node;
+
+    struct {
+      binary_op op;
+      node *l_val;
+      node *r_val;
+    } binary_expression_node;
+
+    struct {
+      node *type;
+    } literal_expression_node;
+
+    struct {
+      node *expressoin;
+    } paren_expression_node;
+
+    struct {
+      node *variable;
+    } variable_expression_node;
+
+    struct {
+      char *id;
+    } singular_variable;
+
+    struct {
+      char *id;
+      node *type;
+      // TODO: figure out how do handle this situation
+    } array_variable;
+
+    struct {
+    }
+    struct {
+    }
+    struct {
+    }
   };
 };
 

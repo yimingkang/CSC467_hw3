@@ -25,15 +25,17 @@ node *ast_allocate(node_kind kind, ...) {
   
   // ...
 
-  case BINARY_EXPRESSION_NODE:
-    ast->binary_expr.op = va_arg(args, int);
-    ast->binary_expr.left = va_arg(args, node *);
-    ast->binary_expr.right = va_arg(args, node *);
-    break;
-
-  // ...
-
-  default: break;
+      case BINARY_EXPRESSION_NODE:
+        ast->binary_expr.op = va_arg(args, int);
+        ast->binary_expr.left = va_arg(args, node *);
+        ast->binary_expr.right = va_arg(args, node *);
+        break;
+    
+      case EXPRESSION_NODE:
+        ast->
+          // ...
+    
+      default: break;
   }
 
   va_end(args);
