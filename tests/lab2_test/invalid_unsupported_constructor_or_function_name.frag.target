@@ -1,0 +1,5 @@
+
+PARSER ERROR, LINE 2: syntax error, unexpected '('
+type -> INT_T
+variable -> ID
+expression -> variable

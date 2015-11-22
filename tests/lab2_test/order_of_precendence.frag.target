@@ -1,0 +1,336 @@
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> INT_C
+expression -> expression '-' expression %prec '-'
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> INT_C
+expression -> expression '-' expression %prec '-'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> expression '*' expression %prec '*'
+expression -> INT_C
+expression -> expression '*' expression %prec '*'
+expression -> INT_C
+expression -> expression '/' expression %prec '/'
+expression -> INT_C
+expression -> expression '/' expression %prec '/'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> expression '*' expression %prec '*'
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> INT_C
+expression -> expression '*' expression %prec '*'
+expression -> expression '+' expression %prec '+'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> INT_C
+expression -> expression '/' expression %prec '/'
+expression -> expression '-' expression %prec '-'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> INT_C
+expression -> expression '^' expression %prec '^'
+expression -> expression '^' expression %prec '^'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> INT_C
+expression -> expression '^' expression %prec '^'
+expression -> expression '+' expression %prec '+'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> INT_C
+expression -> expression '^' expression %prec '^'
+expression -> expression '*' expression %prec '*'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> '!' expression %prec '!'
+expression -> INT_C
+expression -> expression '-' expression %prec '-'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> '!' expression %prec '!'
+expression -> expression '-' expression %prec '-'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> '-' expression %prec UMINUS
+expression -> expression '-' expression %prec '-'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> '-' expression %prec UMINUS
+expression -> INT_C
+expression -> expression '-' expression %prec '-'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> '-' expression %prec UMINUS
+expression -> expression '*' expression %prec '*'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> '(' expression ')'
+expression -> INT_C
+expression -> expression '*' expression %prec '*'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> INT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> '(' expression ')'
+expression -> expression '+' expression %prec '+'
+expression -> '(' expression ')'
+expression -> expression '+' expression %prec '+'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> '(' expression ')'
+expression -> INT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> '(' expression ')'
+expression -> expression '+' expression %prec '+'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> '(' expression ')'
+expression -> INT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> '(' expression ')'
+expression -> expression '*' expression %prec '*'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> INT_C
+expression -> expression '^' expression %prec '^'
+expression -> '(' expression ')'
+expression -> expression '^' expression %prec '^'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> '(' expression ')'
+expression -> expression '^' expression %prec '^'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> '(' expression ')'
+expression -> '!' expression %prec '!'
+expression -> expression '*' expression %prec '*'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> expression '<' expression %prec '<'
+expression -> INT_C
+expression -> INT_C
+expression -> expression LEQ expression %prec LEQ
+expression -> expression AND expression %prec AND
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> expression '>' expression %prec '>'
+expression -> INT_C
+expression -> INT_C
+expression -> expression GEQ expression %prec GEQ
+expression -> expression OR expression %prec OR
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> INT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> expression GEQ expression %prec GEQ
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> INT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+expression -> INT_C
+expression -> INT_C
+expression -> expression '-' expression %prec '-'
+expression -> expression OR expression %prec OR
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression AND expression %prec AND
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression AND expression %prec AND
+expression -> expression OR expression %prec OR
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '>' expression %prec '>'
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '>' expression %prec '>'
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+statement -> IF '(' expression ')' statement ELSE statement %prec HIGH
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+statement -> IF '(' expression ')' statement ELSE statement %prec HIGH
+statements -> statements statement
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '>' expression %prec '>'
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '>' expression %prec '>'
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+statement -> IF '(' expression ')' statement ELSE statement %prec HIGH
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+statement -> IF '(' expression ')' statement ELSE statement %prec HIGH
+statements -> statements statement
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '>' expression %prec '>'
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '>' expression %prec '>'
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+statement -> IF '(' expression ')' statement ELSE statement %prec HIGH
+statement -> IF '(' expression ')' statement %prec LOW
+statements -> statements statement
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '>' expression %prec '>'
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '>' expression %prec '>'
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+statement -> IF '(' expression ')' statement %prec LOW
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+statement -> IF '(' expression ')' statement ELSE statement %prec HIGH
+statements -> statements statement
+scope -> '{' declarations statements '}'
+program -> scope

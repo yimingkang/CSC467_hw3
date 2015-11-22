@@ -1,0 +1,3 @@
+
+PARSER ERROR, LINE 2: syntax error, unexpected '+', expecting ';' or '='
+type -> VEC_T

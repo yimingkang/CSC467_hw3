@@ -66,6 +66,7 @@ enum {
   char *as_str;
   int as_func;
   node *as_ast;
+  std::vector<node*>* as_node_list;
 }
 
 %token          FLOAT_T
@@ -73,12 +74,12 @@ enum {
 %token          BOOL_T
 %token          CONST
 %token          FALSE_C TRUE_C
-%token          FUNC
 %token          IF ELSE
 %token          AND OR NEQ EQ LEQ GEQ
 
 // links specific values of tokens to yyval
 %token <as_vec>   VEC_T
+%token <as_func>  FUNC
 %token <as_vec>   BVEC_T
 %token <as_vec>   IVEC_T
 %token <as_float> FLOAT_C
@@ -101,8 +102,17 @@ enum {
 
 // type declarations
 // TODO: fill this out
+%type <as_ast> program
+%type <as_ast> scope
+%type <as_node_list> declarations
+%type <as_node_list> statements
+%type <as_ast> declaration
+%type <as_ast> statement
+%type <as_ast> type
+%type <as_ast> variable
 %type <as_ast> expression
-
+%type <as_node_list> arguments_opt
+%type <as_node_list> arguments
 // expect one shift/reduce conflict, where Bison chooses to shift
 // the ELSE.
 %expect 1
@@ -120,141 +130,255 @@ enum {
  ***********************************************************************/
 program
   : scope 
-      { yTRACE("program -> scope\n") } 
+      { 
+            $$ = ast_allocate(PROGRAM, $1);
+            yTRACE("program -> scope\n") 
+      } 
   ;
 
 scope
   : '{' declarations statements '}'
-      { yTRACE("scope -> { declarations statements }\n") }
+      { 
+            $$ = ast_allocate(SCOPE, $2, $3);
+            yTRACE("scope -> { declarations statements }\n") 
+      }
   ;
 
 declarations
   : declarations declaration
-      { yTRACE("declarations -> declarations declaration\n") }
+      {
+        $$ = $1;
+        $1->push_back($2);
+         yTRACE("declarations -> declarations declaration\n") 
+      }
   | 
-      { yTRACE("declarations -> \n") }
+      {
+        $$ = new std::vector<node*>();
+         yTRACE("declarations -> \n") 
+      }
   ;
 
 statements
   : statements statement
-      { yTRACE("statements -> statements statement\n") }
+      { 
+        $$ = $1;
+        $1->push_back($2);
+        yTRACE("statements -> statements statement\n")
+       }
   | 
-      { yTRACE("statements -> \n") }
+      {
+        $$ = new std::vector<node*>();
+         yTRACE("statements -> \n") 
+      }
   ;
 
 declaration
   : type ID ';' 
-      { yTRACE("declaration -> type ID ;\n") }
+      { 
+        $$ = ast_allocate(DECLARATION, $1, $2,NULL, 0);
+        yTRACE("declaration -> type ID ;\n") 
+      }
   | type ID '=' expression ';'
-      { yTRACE("declaration -> type ID = expression ;\n") }
+      { 
+        $$ = ast_allocate(DECLARATION, $1, $2, $4, 0);
+        yTRACE("declaration -> type ID = expression ;\n") 
+      }
   | CONST type ID '=' expression ';'
-      { yTRACE("declaration -> CONST type ID = expression ;\n") }
+      { 
+        $$ = ast_allocate(DECLARATION, $2, $3, $5, 1);
+        yTRACE("declaration -> CONST type ID = expression ;\n")
+       }
   ;
 
 statement
   : variable '=' expression ';'
-      { yTRACE("statement -> variable = expression ;\n") }
+      {
+         $$ = ast_allocate(STATEMENT_ASSIGN, $1, $3);
+         yTRACE("statement -> variable = expression ;\n") 
+      }
   | IF '(' expression ')' statement ELSE statement %prec WITH_ELSE
-      { yTRACE("statement -> IF ( expression ) statement ELSE statement \n") }
+      { 
+        $$ = ast_allocate(STATEMENT_IF, $3, $5, $7);
+        yTRACE("statement -> IF ( expression ) statement ELSE statement \n")
+      }
   | IF '(' expression ')' statement %prec WITHOUT_ELSE
-      { yTRACE("statement -> IF ( expression ) statement \n") }
+      { 
+        $$ = ast_allocate(STATEMENT_IF, $3, $5, NULL);
+        yTRACE("statement -> IF ( expression ) statement \n")
+       }
   | scope 
-      { yTRACE("statement -> scope \n") }
+      {
+        $$ = $1;
+         yTRACE("statement -> scope \n") 
+      }
   | ';'
       { yTRACE("statement -> ; \n") }
   ;
 
 type
   : INT_T
-      { yTRACE("type -> INT_T \n") }
+      {
+        $$ = ast_allocate(TYPE_INT, 0);
+        yTRACE("type -> INT_T \n") 
+      }
   | IVEC_T
-      { yTRACE("type -> IVEC_T \n") }
+      { 
+        $$ = ast_allocate(TYPE_IVEC, $1);
+        yTRACE("type -> IVEC_T \n")
+      }
   | BOOL_T
-      { yTRACE("type -> BOOL_T \n") }
+      {
+        $$ = ast_allocate(TYPE_BOOL, 0);
+        yTRACE("type -> BOOL_T \n")
+      }
   | BVEC_T
-      { yTRACE("type -> BVEC_T \n") }
+      {
+        $$ = ast_allocate(TYPE_BVEC, $1);    
+         yTRACE("type -> BVEC_T \n")
+      }
   | FLOAT_T
-      { yTRACE("type -> FLOAT_T \n") }
+      {
+        $$ = ast_allocate(TYPE_FLOAT, 0);
+        yTRACE("type -> FLOAT_T \n") 
+      }
   | VEC_T
-      { yTRACE("type -> VEC_T \n") }
+      { 
+        $$ = ast_allocate(TYPE_VEC, $1);
+        yTRACE("type -> VEC_T \n") 
+      }
   ;
 
 expression
 
   /* function-like operators */
   : type '(' arguments_opt ')' %prec '('
-      { yTRACE("expression -> type ( arguments_opt ) \n") }
+      {
+        $$ = ast_allocate(EXPRESSION_CONSTRUCTOR, $1,$3);
+        yTRACE("expression -> type ( arguments_opt ) \n") }
   | FUNC '(' arguments_opt ')' %prec '('
-      { yTRACE("expression -> FUNC ( arguments_opt ) \n") }
+      { 
+        $$ = ast_allocate(EXPRESSION_FUNC, $1,$3);
+        yTRACE("expression -> FUNC ( arguments_opt ) \n") }
 
   /* unary opterators */
   | '-' expression %prec UMINUS
-      { yTRACE("expression -> - expression \n") }
+      { 
+        $$ = ast_allocate(EXPRESSION_UNARY_A,$2);
+        yTRACE("expression -> - expression \n") }
   | '!' expression %prec '!'
-      { yTRACE("expression -> ! expression \n") }
+      {
+        $$ = ast_allocate(EXPRESSION_UNARY_L, $2);
+         yTRACE("expression -> ! expression \n") }
 
   /* binary operators */
   | expression AND expression %prec AND
-      { yTRACE("expression -> expression AND expression \n") }
+      { 
+        $$ = ast_allocate(EXPRESSION_AND, $1, $3);
+        yTRACE("expression -> expression AND expression \n") }
   | expression OR expression %prec OR
-      { yTRACE("expression -> expression OR expression \n") }
+      { 
+        $$ = ast_allocate(EXPRESSION_OR, $1, $3);
+        yTRACE("expression -> expression OR expression \n") }
   | expression EQ expression %prec EQ
-      { yTRACE("expression -> expression EQ expression \n") }
+      { 
+        $$ = ast_allocate(EXPRESSION_EQ, $1, $3);
+        yTRACE("expression -> expression EQ expression \n") }
   | expression NEQ expression %prec NEQ
-      { yTRACE("expression -> expression NEQ expression \n") }
+      { 
+        $$ = ast_allocate(EXPRESSION_NEQ, $1, $3);
+        yTRACE("expression -> expression NEQ expression \n") }
   | expression '<' expression %prec '<'
-      { yTRACE("expression -> expression < expression \n") }
+      {     
+        $$ = ast_allocate(EXPRESSION_LT, $1, $3);
+        yTRACE("expression -> expression < expression \n") }
   | expression LEQ expression %prec LEQ
-      { yTRACE("expression -> expression LEQ expression \n") }
+      {
+        $$ = ast_allocate(EXPRESSION_LET, $1, $3);
+         yTRACE("expression -> expression LEQ expression \n") }
   | expression '>' expression %prec '>'
-      { yTRACE("expression -> expression > expression \n") }
+      {
+        $$ = ast_allocate(EXPRESSION_GT, $1, $3);
+        yTRACE("expression -> expression > expression \n") }
   | expression GEQ expression %prec GEQ
-      { yTRACE("expression -> expression GEQ expression \n") }
+      { 
+        $$ = ast_allocate(EXPRESSION_GET, $1, $3);
+        yTRACE("expression -> expression GEQ expression \n") }
   | expression '+' expression %prec '+'
-      { yTRACE("expression -> expression + expression \n") }
+      {
+        $$ = ast_allocate(EXPRESSION_ADD, $1, $3);
+         yTRACE("expression -> expression + expression \n") }
   | expression '-' expression %prec '-'
-      { yTRACE("expression -> expression - expression \n") }
+      {
+        $$ = ast_allocate(EXPRESSION_SUB, $1, $3);
+         yTRACE("expression -> expression - expression \n") }
   | expression '*' expression %prec '*'
-      { yTRACE("expression -> expression * expression \n") }
+      { 
+        $$ = ast_allocate(EXPRESSION_MUL, $1, $3);
+        yTRACE("expression -> expression * expression \n") }
   | expression '/' expression %prec '/'
-      { yTRACE("expression -> expression / expression \n") }
+      { 
+        $$ = ast_allocate(EXPRESSION_DIV, $1, $3);
+        yTRACE("expression -> expression / expression \n") }
   | expression '^' expression %prec '^'
-      { yTRACE("expression -> expression ^ expression \n") }
+      {
+        $$ = ast_allocate(EXPRESSION_POW, $1, $3);
+         yTRACE("expression -> expression ^ expression \n") }
 
   /* literals */
   | TRUE_C
-      { yTRACE("expression -> TRUE_C \n") }
+      { 
+        $$ = ast_allocate(EXPRESSION_BOOL_C, 1);
+        yTRACE("expression -> TRUE_C \n") }
   | FALSE_C
-      { yTRACE("expression -> FALSE_C \n") }
+      {
+        $$ = ast_allocate(EXPRESSION_BOOL_C, 0);
+         yTRACE("expression -> FALSE_C \n") }
   | INT_C
-      { yTRACE("expression -> INT_C \n") }
+      {
+        $$ = ast_allocate(EXPRESSION_INT_C, $1);
+         yTRACE("expression -> INT_C \n") }
   | FLOAT_C
-      { yTRACE("expression -> FLOAT_C \n") }
+      {
+        $$ = ast_allocate(EXPRESSION_FLOAT_C, $1);
+         yTRACE("expression -> FLOAT_C \n") }
 
   /* misc */
   | '(' expression ')'
       { yTRACE("expression -> ( expression ) \n") }
-  | variable { }
-    { yTRACE("expression -> variable \n") }
+  | variable
+    { 
+        $$ = $1;
+        yTRACE("expression -> variable \n") }
   ;
 
 variable
   : ID
-      { yTRACE("variable -> ID \n") }
+      { 
+        $$ = ast_allocate(EXPRESSION_VARIABLE, $1, 0, -1);
+        yTRACE("variable -> ID \n") }
   | ID '[' INT_C ']' %prec '['
-      { yTRACE("variable -> ID [ INT_C ] \n") }
+      {
+        $$ = ast_allocate(EXPRESSION_VARIABLE, $1, 1, $3);
+         yTRACE("variable -> ID [ INT_C ] \n") }
   ;
 
 arguments
   : arguments ',' expression
-      { yTRACE("arguments -> arguments , expression \n") }
+      { 
+        $$ = $1;
+        $1->push_back($3);
+        yTRACE("arguments -> arguments , expression \n") }
   | expression
-      { yTRACE("arguments -> expression \n") }
+      { 
+        $$ = new std::vector<node*>();
+        yTRACE("arguments -> expression \n") }
   ;
 
 arguments_opt
   : arguments
-      { yTRACE("arguments_opt -> arguments \n") }
+      { 
+        $$ = $1;
+        yTRACE("arguments_opt -> arguments \n") }
   |
       { yTRACE("arguments_opt -> \n") }
   ;

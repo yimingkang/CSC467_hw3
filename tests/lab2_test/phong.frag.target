@@ -1,0 +1,157 @@
+type -> VEC_T
+variable -> ID
+expression -> variable
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> VEC_T
+variable -> ID
+expression -> variable
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> VEC_T
+declaration -> type ID ';'
+declarations -> declarations declaration
+type -> VEC_T
+declaration -> type ID ';'
+declarations -> declarations declaration
+type -> VEC_T
+declaration -> type ID ';'
+declarations -> declarations declaration
+type -> VEC_T
+variable -> ID
+expression -> variable
+declaration -> CONST type ID '=' expression ';'
+declarations -> declarations declaration
+type -> VEC_T
+variable -> ID
+expression -> variable
+declaration -> CONST type ID '=' expression ';'
+declarations -> declarations declaration
+type -> VEC_T
+type -> VEC_T
+expression -> FLOAT_C
+arguments -> expression
+expression -> FLOAT_C
+arguments -> arguments ',' expression
+expression -> FLOAT_C
+arguments -> arguments ',' expression
+expression -> FLOAT_C
+arguments -> arguments ',' expression
+constructor -> type '(' arguments ')' %prec '('
+expression -> constructor
+declaration -> CONST type ID '=' expression ';'
+declarations -> declarations declaration
+variable -> ID
+variable -> ID
+expression -> variable
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID '[' INT_C ']' %prec '['
+function_name -> FUNC
+variable -> ID
+expression -> variable
+arguments -> expression
+variable -> ID
+expression -> variable
+arguments -> arguments ',' expression
+arguments_opt -> arguments
+function -> function_name '(' arguments_opt ')' %prec '('
+expression -> function
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID '[' INT_C ']' %prec '['
+function_name -> FUNC
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+arguments -> expression
+arguments_opt -> arguments
+function -> function_name '(' arguments_opt ')' %prec '('
+expression -> function
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+expression -> expression '*' expression %prec '*'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '*' expression %prec '*'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID '[' INT_C ']' %prec '['
+function_name -> FUNC
+variable -> ID
+expression -> variable
+arguments -> expression
+variable -> ID
+expression -> variable
+arguments -> arguments ',' expression
+arguments_opt -> arguments
+function -> function_name '(' arguments_opt ')' %prec '('
+expression -> function
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID '[' INT_C ']' %prec '['
+function_name -> FUNC
+variable -> ID
+expression -> variable
+arguments -> expression
+variable -> ID
+expression -> variable
+arguments -> arguments ',' expression
+arguments_opt -> arguments
+function -> function_name '(' arguments_opt ')' %prec '('
+expression -> function
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID '[' INT_C ']' %prec '['
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+function_name -> FUNC
+variable -> ID
+expression -> variable
+arguments -> expression
+arguments_opt -> arguments
+function -> function_name '(' arguments_opt ')' %prec '('
+expression -> function
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '*' expression %prec '*'
+expression -> expression '+' expression %prec '+'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '*' expression %prec '*'
+expression -> expression '+' expression %prec '+'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+program -> scope
