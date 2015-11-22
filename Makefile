@@ -22,7 +22,7 @@
 # Compiler and Compiler Flags
 ###########################################################################
 CC      =g++
-CFLAGS  =-g -O0 -Wall
+CFLAGS  =-g -O0 -Wall -fpermissive
 LDLIBS  =-ll
 
 LEX     =flex
