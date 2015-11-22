@@ -151,7 +151,7 @@ declarations
       }
   | 
       {
-        $$ = ast_allocate(NODE_LIST, NULL, NULL);
+        $$ = NULL;
          yTRACE("declarations -> \n") 
       }
   ;
@@ -164,7 +164,7 @@ statements
        }
   | 
       {
-        $$ = ast_allocate(NODE_LIST, NULL, NULL);
+        $$ = NULL;
          yTRACE("statements -> \n") 
       }
   ;
@@ -205,6 +205,7 @@ statement
        }
   | scope 
       {
+        // TODO: WHAT??
         $$ = $1;
          yTRACE("statement -> scope \n") 
       }
