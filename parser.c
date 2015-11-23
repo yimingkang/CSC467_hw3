@@ -1630,7 +1630,7 @@ yyreduce:
 #line 224 "parser.y"
     {
       // ivecX would result in $1 == n - 1, src in scanner.l
-      (yyval.as_ast) = ast_allocate(TYPE, IVEC_TYPE, (yyvsp[(1) - (1)].as_vec));
+      (yyval.as_ast) = ast_allocate(TYPE, INT_TYPE, (yyvsp[(1) - (1)].as_vec));
       yTRACE("type -> IVEC_T \n") 
       }
     break;
@@ -1646,7 +1646,7 @@ yyreduce:
   case 19:
 #line 235 "parser.y"
     { 
-      (yyval.as_ast) = ast_allocate(TYPE, BVEC_TYPE, (yyvsp[(1) - (1)].as_vec));
+      (yyval.as_ast) = ast_allocate(TYPE, BOOL_TYPE, (yyvsp[(1) - (1)].as_vec));
       yTRACE("type -> BVEC_T \n") 
       }
     break;
@@ -1662,7 +1662,7 @@ yyreduce:
   case 21:
 #line 245 "parser.y"
     {
-      (yyval.as_ast) = ast_allocate(TYPE, VEC_TYPE, (yyvsp[(1) - (1)].as_vec));
+      (yyval.as_ast) = ast_allocate(TYPE, FLOAT_TYPE, (yyvsp[(1) - (1)].as_vec));
       yTRACE("type -> VEC_T \n") 
       }
     break;
