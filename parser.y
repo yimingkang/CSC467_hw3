@@ -223,7 +223,7 @@ type
   | IVEC_T
       {
       // ivecX would result in $1 == n - 1, src in scanner.l
-      $$ = ast_allocate(TYPE, IVEC_TYPE, $1);
+      $$ = ast_allocate(TYPE, INT_TYPE, $1);
       yTRACE("type -> IVEC_T \n") 
       }
   | BOOL_T
@@ -233,7 +233,7 @@ type
       }
   | BVEC_T
       { 
-      $$ = ast_allocate(TYPE, BVEC_TYPE, $1);
+      $$ = ast_allocate(TYPE, BOOL_TYPE, $1);
       yTRACE("type -> BVEC_T \n") 
       }
   | FLOAT_T
@@ -243,7 +243,7 @@ type
       }
   | VEC_T
       {
-      $$ = ast_allocate(TYPE, VEC_TYPE, $1);
+      $$ = ast_allocate(TYPE, FLOAT_TYPE, $1);
       yTRACE("type -> VEC_T \n") 
       }
   ;

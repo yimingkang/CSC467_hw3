@@ -406,14 +406,14 @@ void ast_print(node * ast) {
     
       // declaration
       case DECLARATION:
-          printf("( DECLARATION \n");
+          printf("( DECLARATION ");
           printf(" ID=%s ", ast->declaration.id);
           ast_print(ast->declaration.type );
           printf(")\n");
           break;
 
       case INITIALIZED_DECLARATION:
-          printf("( DECLARATION \n");
+          printf("( DECLARATION ");
           printf(" ID=%s ", ast->declaration.id);
           ast_print(ast->initialized_declaration.type );
           ast_print(ast->initialized_declaration.expression );
@@ -421,7 +421,7 @@ void ast_print(node * ast) {
           break;
 
       case CONST_DECLARATION:
-          printf("( DECLARATION \n");
+          printf("( DECLARATION ");
           printf(" ID=%s ", ast->declaration.id);
           ast_print(ast->const_declaration.type );
           ast_print(ast->const_declaration.expression );
@@ -605,9 +605,9 @@ char *u_op_str(int op_code){
 char *type_str(int type_code, int multiplicity){
     switch(type_code){
         case INT_TYPE:
-            return "INT";
-        case IVEC_TYPE:
             switch(multiplicity){
+                case 0:
+                    return "INT";
                 case 1:
                     return "IVEC2";
                 case 2:
@@ -618,9 +618,9 @@ char *type_str(int type_code, int multiplicity){
                     return "IVEC?";
             }
         case BOOL_TYPE:
-            return "BOOL";
-        case BVEC_TYPE:
             switch(multiplicity){
+                case 0:
+                    return "BOOL";
                 case 1:
                     return "BVEC2";
                 case 2:
@@ -631,9 +631,9 @@ char *type_str(int type_code, int multiplicity){
                     return "BVEC?";
             }
         case FLOAT_TYPE:
-            return "FLOAT";
-        case VEC_TYPE:
             switch(multiplicity){
+                case 0:
+                    return "FLOAT";
                 case 1:
                     return "VEC2";
                 case 2:
