@@ -67,7 +67,12 @@ int get_type_by_id(char *id){
 
 int check_existance(char *name){
     // TODO: finish this function
-    return -1;
+    list_node_t * node = search(symbol_stack, name);
+    if (!node){
+        return -1;
+    } else{
+        return 0;
+    }
 }
 
 int check_args(node *starting_node){
@@ -98,7 +103,8 @@ int semantic_check( node *ast) {
     int multiplicity, arg_type, condition_type, type;
     int declared;
     kind = ast->kind;
-    printf("KIND->%d\n", kind);
+    list_node_t *var_node = NULL;
+    node *variable_node = NULL;
 
   switch(kind){
     // program
@@ -147,7 +153,8 @@ int semantic_check( node *ast) {
             printf("ERROR: Cannot declare variable (already_defined?)\n");
             return -1;
         }
-        return semantic_check(ast->declaration.type);
+        rtype = semantic_check(ast->declaration.type);
+        insert(symbol_stack, ast->declaration.id, rtype, 0, 0);
 
     case INITIALIZED_DECLARATION:
         left_exp = semantic_check(ast->initialized_declaration.type);
@@ -157,6 +164,8 @@ int semantic_check( node *ast) {
             printf("ERROR: Cannot declare variable (already_defined?)\n");
             return -1;
         }
+        rtype = semantic_check(ast->initialized_declaration.type);
+        insert(symbol_stack, ast->initialized_declaration.id, rtype, 0, 0);
         right_exp = semantic_check(ast->initialized_declaration.expression);
         if (left_exp == -1 || right_exp == -1)
             return -1;
@@ -177,6 +186,8 @@ int semantic_check( node *ast) {
             return -1;
         }
         declared = check_existance(ast->const_declaration.id);
+        rtype = semantic_check(ast->const_declaration.type);
+        insert(symbol_stack, ast->const_declaration.id, rtype, 0, 1);
         if (declared != -1){
             printf("ERROR: Cannot declared variable (already_defined)\n");
             return -1;
@@ -188,6 +199,24 @@ int semantic_check( node *ast) {
     case ASSIGNMENT_STATEMENT:
         left_exp = semantic_check(ast->assignment_statement.variable );
         right_exp = semantic_check(ast->assignment_statement.expression );
+
+        variable_node = ast->assignment_statement.variable;
+
+        if (variable_node->kind == SINGULAR_VARIABLE){
+            var_node = search(symbol_stack, variable_node->singular_variable.id);
+        }else{
+            var_node = search(symbol_stack, variable_node->array_variable.id);
+        }
+
+        if (!var_node){
+            return -1;
+        }
+
+        if (var_node->is_const){
+            printf("ERROR: Assigning to a constant var!\n");
+            return -1;
+        }
+
         if (left_exp == -1 or right_exp == -1)
             return -1;
         if (left_exp != right_exp){
@@ -479,9 +508,17 @@ int semantic_check( node *ast) {
     // variable
     case SINGULAR_VARIABLE: 
         // TODO: complete function get_type_by_id
+        if (check_existance(ast->singular_variable.id) == -1){
+            printf("ERROR: Referencing variable not yet defined\n");
+            return -1;
+        }
         return get_type_by_id(ast->singular_variable.id);
 
     case ARRAY_VARIABLE:
+        if (check_existance(ast->array_variable.id) == -1){
+            printf("ERROR: Referencing variable not yet defined\n");
+            return -1;
+        }
         var_type = get_type_by_id(ast->array_variable.id);
         multiplicity = ast->array_variable.multiplicity;
         switch (var_type){
