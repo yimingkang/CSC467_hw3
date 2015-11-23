@@ -6,6 +6,10 @@ Student #:
 Student 2: TianYu Li
 Student #: 999107149
 
+work division
+tianyu li: AST gen, print, delete, documentations, tests
+yiming kang: semantic check, tests
+
 Approach to AST and structure:
 AST is built using bison parser. As bison parsers the streams of tokens using a LL(1) parser, which is bottoms up parser, we allocate the AST node and give it a node_type based on the type of the rule matched. 
 For example, one of the grammer rule for non-terminal "expression" is a single CONSTANT INT token. When this rule is matched, we call ast_allocate to create an ast node forthe constant int literal. ast_allocate takes a enum node_type, and a number of additional arguments depending on the type of node. For constant int literal, the second argument is type, which in this case is INT, and third is a numeric value of type int. Using bison parser conventions, the value of the token or terminals or non-teriminals indicated in the parser rule is referenced sequentially by $1, $2 and so on. $$ is the variable we assign to to propagate up the recursive parse tree, in this case we assign the new node.
@@ -27,3 +31,13 @@ Approach to semantic checking
 yyparse() generates a AST where the head node is store at global variable ast.
 Then we build the symbol table.
 
+Semantic Checking Approach
+==================================================================
+We traverse the tree from top to bottom recursively. We build the symbol table along the way. Wheever we see a SCOPENODE, we traverse the DECLARATIONS first. The symbol table is implementd as a stack using a linked list. Each node is a symbol, containing type, id, scope level, and attribute (UNIFORM, etc). The recursion function takes in the head of the symol table stack. This stack contains symbols that are already in the scopes above the AST. Each declaration will add to the stack, returning a new symbol table head. 
+As we traverse the tree, in declaration nodes, we search the new symbol in the stack,the searh stops when scope level of the symbol is lower than the current scope level. If no symbol is found a new symbol is added.
+When we enter a scope node, the scope level increases by one. We retains the existing symol table head. When we return from a scope node, the scope level decreases by one, and we pop the symbol table until we reach the old symbol table head. 
+As we traverses the other types of nodes, we check the validity of the type of the oprands in the context of the operation. We simply print the error message when there is one.
+===========================================================
+Challenges:
+* one challenge we face is in semantic checking, we want to traverse the tree to find different results based on the node. For example, in expression node, we want to find out the type of the operands of the expression, and see if the type is valid. We sovled this by creating different recursive functions
+* The discovery of the correct argument list for the function and constructor was diffuclt because we have to check for each expression passed against the variable. But then every argument in the list as the same type for all functions. So we use this short cut to not require traversing two lists at the same time.
