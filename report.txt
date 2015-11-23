@@ -41,3 +41,8 @@ As we traverses the other types of nodes, we check the validity of the type of t
 Challenges:
 * one challenge we face is in semantic checking, we want to traverse the tree to find different results based on the node. For example, in expression node, we want to find out the type of the operands of the expression, and see if the type is valid. We sovled this by creating different recursive functions
 * The discovery of the correct argument list for the function and constructor was diffuclt because we have to check for each expression passed against the variable. But then every argument in the list as the same type for all functions. So we use this short cut to not require traversing two lists at the same time.
+
+
+==========================================================
+tests
+the tests are located in tests/lab3_test/
