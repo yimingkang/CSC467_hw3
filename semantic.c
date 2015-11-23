@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "semantic.h"
+#include "linked_list.c"  // last minute hack
 
-int scope_level = 0;
-int scope_base = 0;
+
+typedef enum {
+    RESULT,
+    ATTRIBUTE,
+    UNIFORM,
+}variable_type;
 
 enum {
     INT,
@@ -19,11 +24,48 @@ enum {
     BVEC3,
     BVEC4,
 };
-int get_type_by_id(char *id, int scope){
+
+linked_list_t *symbol_stack = NULL;
+
+void stack_init(){
+    if (symbol_stack){
+        return;
+    }
+
+    symbol_stack = linked_list();
+
+    // stack, name, data_type, type, is_const
+    insert(symbol_stack, "gl_FragColor", VEC4, RESULT, 0);
+    insert(symbol_stack, "gl_FragDepth", BOOL, RESULT, 0);
+    insert(symbol_stack, "gl_FragCoord", VEC4, RESULT, 0);
+
+    insert(symbol_stack, "gl_TexCoord", VEC4, ATTRIBUTE, 0);
+    insert(symbol_stack, "gl_Color", VEC4, ATTRIBUTE, 0);
+    insert(symbol_stack, "gl_Secondary", VEC4, ATTRIBUTE, 0);
+    insert(symbol_stack, "gl_FogFragCoord", VEC4, ATTRIBUTE, 0);
+
+    insert(symbol_stack, "gl_Light_Half", VEC4, UNIFORM, 0);
+    insert(symbol_stack, "gl_Light_Ambient", VEC4, UNIFORM, 0);
+    insert(symbol_stack, "gl_Material_Shininess", VEC4, UNIFORM, 0);
+
+    insert(symbol_stack, "env1", VEC4, UNIFORM, 0);
+    insert(symbol_stack, "env2", VEC4, UNIFORM, 0);
+    insert(symbol_stack, "env3", VEC4, UNIFORM, 0);
+
+    /* stack test
+    list_node_t *node = search(symbol_stack, "env1");
+    if (node){
+        printf("ENV1 found ---- %d\n", node->data_type);
+    }
+    printf("HEAD is %s\n", symbol_stack->head->name);
+    printf("Tail is %s\n", symbol_stack->tail->name);
+    */
+}
+int get_type_by_id(char *id){
     return 0;
 }
 
-int check_existance(char *name, int scope){
+int check_existance(char *name){
     // TODO: finish this function
     return -1;
 }
@@ -42,6 +84,10 @@ int check_args(node *starting_node){
 
 
 int semantic_check( node *ast) {
+    stack_init();
+
+    list_node_t *previous_stack_node = NULL;
+
     if(ast==NULL){
         //printf("ERROR empty tree\n");
         return 0;
@@ -61,10 +107,15 @@ int semantic_check( node *ast) {
   
     // scope
     case SCOPE:
-        scope_level++;
+        // save current stack position
+        previous_stack_node = symbol_stack->tail;
+
         left_exp = semantic_check(ast->scope.declarations );
         right_exp = semantic_check(ast->scope.statements );
-        scope_level--;
+
+        // restore prev stack position
+        delete_from(symbol_stack, previous_stack_node);
+
         if (left_exp == -1 || right_exp == -1){
             return -1;
         }
@@ -90,7 +141,7 @@ int semantic_check( node *ast) {
   
     // declaration
     case DECLARATION:
-        declared = check_existance(ast->declaration.id, scope_level);
+        declared = check_existance(ast->declaration.id);
         if (declared != -1){
             // -1 means not yet defined
             printf("ERROR: Cannot declare variable (already_defined?)\n");
@@ -100,7 +151,7 @@ int semantic_check( node *ast) {
 
     case INITIALIZED_DECLARATION:
         left_exp = semantic_check(ast->initialized_declaration.type);
-        declared = check_existance(ast->initialized_declaration.id, scope_level);
+        declared = check_existance(ast->initialized_declaration.id);
         if (declared != -1){
             // -1 means not yet defined
             printf("ERROR: Cannot declare variable (already_defined?)\n");
@@ -125,7 +176,7 @@ int semantic_check( node *ast) {
             printf("ERROR: Const initialization type mismatch\n");
             return -1;
         }
-        declared = check_existance(ast->const_declaration.id, scope_level);
+        declared = check_existance(ast->const_declaration.id);
         if (declared != -1){
             printf("ERROR: Cannot declared variable (already_defined)\n");
             return -1;
@@ -428,10 +479,10 @@ int semantic_check( node *ast) {
     // variable
     case SINGULAR_VARIABLE: 
         // TODO: complete function get_type_by_id
-        return get_type_by_id(ast->singular_variable.id, scope_level);
+        return get_type_by_id(ast->singular_variable.id);
 
     case ARRAY_VARIABLE:
-        var_type = get_type_by_id(ast->array_variable.id, scope_level);
+        var_type = get_type_by_id(ast->array_variable.id);
         multiplicity = ast->array_variable.multiplicity;
         switch (var_type){
             case BOOL:
