@@ -192,6 +192,164 @@ node *ast_allocate(node_kind kind, ...) {
 
 void ast_free(node *ast) {
 
+    if(ast==NULL)
+        return;
+
+    int kind;
+
+    kind = ast->kind;
+
+
+    switch(kind){
+      // program
+      case PROGRAM:
+          ast_free(ast->program.scope);
+          free(ast);
+          break;
+    
+      // scope
+      case SCOPE:
+          ast_free(ast->scope.declarations);
+          ast_free(ast->scope.statements);
+          free(ast);
+          break;
+    
+      // declarations
+      case DECLARATIONS: // includes null
+          ast_free(ast->declarations.declarations);
+          ast_free(ast->declarations.declaration);
+          free(ast);
+          break;
+    
+      // statements:
+      case STATEMENTS: // includes null
+          ast_free(ast->statements.statements );
+          ast_free(ast->statements.statement );
+          free(ast);
+          break;
+    
+      // declaration
+      case DECLARATION:
+          ast_free(ast->declaration.type );
+          free(ast);
+          break;
+
+      case INITIALIZED_DECLARATION:
+          ast_free(ast->initialized_declaration.type );
+          ast_free(ast->initialized_declaration.expression );
+          free(ast);
+          break;
+
+      case CONST_DECLARATION:
+          ast_free(ast->const_declaration.type );
+          ast_free(ast->const_declaration.expression );
+          free(ast);
+          break;
+    
+      // statement
+      case ASSIGNMENT_STATEMENT:
+          ast_free(ast->assignment_statement.variable );
+          ast_free(ast->assignment_statement.expression );
+          free(ast);
+          break;
+
+      case IF_ELSE_STATEMENT:
+          ast_free(ast->if_else_statement.if_condition );
+          ast_free(ast->if_else_statement.statement );
+          ast_free(ast->if_else_statement.else_statement );
+          free(ast);
+          break;
+
+      case IF_STATEMENT:
+          ast_free(ast->if_statement.if_condition );
+          ast_free(ast->if_statement.statement );
+          free(ast);
+          break;
+
+      case SCOPE_STATEMENT:
+          ast_free(ast->scope_statement.scope );
+          free(ast);
+          break;
+
+      case SEMICOLEN_STATEMENT:
+          free(ast);
+          break;
+    
+      // Expression
+      case FUNC_EXPRESSION_NODE:
+          ast_free(ast->func_expression_node.arguments_opt );
+          free(ast);
+          break;
+
+      case TYPE_EXPRESSION_NODE:
+          ast_free(ast->type_expression_node.type );
+          ast_free(ast->type_expression_node.arguments_opt );
+          free(ast);
+          break;
+
+      case BINARY_EXPRESSION_NODE:
+          ast_free(ast->binary_expression_node.l_val);
+          ast_free(ast->binary_expression_node.r_val);
+          free(ast);
+          break;
+
+      case UNARY_EXPRESSION_NODE:
+          ast_free(ast->unary_expression_node.expression );
+          free(ast);
+          break;
+
+      case PAREN_EXPRESSION_NODE:
+          ast_free(ast->paren_expression_node.expression );
+          free(ast);
+          break;
+
+      case VARIABLE_EXPRESSION_NODE:
+          ast_free(ast->variable_expression_node.variable );
+          free(ast);
+          break;
+
+      case LITERAL_EXPRESSION_NODE:
+          free(ast);
+          break;
+    
+      // variable
+      case SINGULAR_VARIABLE: 
+          free(ast);
+          break;
+
+      case ARRAY_VARIABLE:
+          free(ast);
+          break;
+          
+    
+      // ast_free(arguments
+      case BINARY_ARGUMENT:
+          ast_free(ast->binary_arguments.expression);
+          ast_free(ast->binary_arguments.arguments);
+          free(ast);
+          break;
+
+      case UNARY_ARGUMENT:
+          ast_free(ast->unary_argument.expression );
+          free(ast);
+          break;
+    
+      // ast_free(argument_opt
+      case ARGUMENT_OPT:
+          ast_free(ast->arguments_opt.arguments );
+          free(ast);
+          break;
+    
+      // type
+      case TYPE:
+          free(ast);
+          break;
+    
+      case UNKNOWN:
+      default:
+          free(ast);
+        break;
+  }
 }
 
 int print_level = 0;

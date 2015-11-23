@@ -1,0 +1,15 @@
+
+PARSER ERROR, LINE 6: syntax error, unexpected ELSE
+expression -> INT_C
+type -> VEC_T
+declaration -> type ID ';'
+declarations -> declarations declaration
+scope -> '{' declarations statements '}'
+statement -> scope
+type -> VEC_T
+declaration -> type ID ';'
+declarations -> declarations declaration
+scope -> '{' declarations statements '}'
+statement -> scope
+statement -> IF '(' expression ')' statement ELSE statement %prec HIGH
+statements -> statements statement

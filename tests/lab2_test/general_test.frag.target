@@ -1,0 +1,305 @@
+type -> INT_T
+expression -> INT_C
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> FLOAT_T
+expression -> FLOAT_C
+expression -> '-' expression %prec UMINUS
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> BOOL_T
+expression -> TRUE_C
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> IVEC_T
+type -> IVEC_T
+expression -> INT_C
+arguments -> expression
+expression -> INT_C
+arguments -> arguments ',' expression
+constructor -> type '(' arguments ')' %prec '('
+expression -> constructor
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> BVEC_T
+type -> BVEC_T
+expression -> TRUE_C
+arguments -> expression
+expression -> FALSE_C
+arguments -> arguments ',' expression
+constructor -> type '(' arguments ')' %prec '('
+expression -> constructor
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> VEC_T
+type -> VEC_T
+expression -> FLOAT_C
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+arguments -> expression
+expression -> FLOAT_C
+expression -> INT_C
+expression -> expression '*' expression %prec '*'
+arguments -> arguments ',' expression
+expression -> TRUE_C
+expression -> TRUE_C
+expression -> expression AND expression %prec AND
+arguments -> arguments ',' expression
+function_name -> FUNC
+type -> VEC_T
+expression -> INT_C
+arguments -> expression
+expression -> INT_C
+arguments -> arguments ',' expression
+expression -> INT_C
+arguments -> arguments ',' expression
+expression -> INT_C
+arguments -> arguments ',' expression
+constructor -> type '(' arguments ')' %prec '('
+expression -> constructor
+arguments -> expression
+arguments_opt -> arguments
+function -> function_name '(' arguments_opt ')' %prec '('
+expression -> function
+arguments -> arguments ',' expression
+constructor -> type '(' arguments ')' %prec '('
+expression -> constructor
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> BOOL_T
+expression -> TRUE_C
+declaration -> CONST type ID '=' expression ';'
+declarations -> declarations declaration
+type -> FLOAT_T
+declaration -> type ID ';'
+declarations -> declarations declaration
+type -> FLOAT_T
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '*' expression %prec '*'
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> FLOAT_T
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '/' expression %prec '/'
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> FLOAT_T
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '+' expression %prec '+'
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> FLOAT_T
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '-' expression %prec '-'
+expression -> '(' expression ')'
+variable -> ID
+expression -> variable
+expression -> expression '/' expression %prec '/'
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> FLOAT_T
+expression -> INT_C
+expression -> INT_C
+variable -> ID
+expression -> variable
+expression -> expression '*' expression %prec '*'
+expression -> expression '-' expression %prec '-'
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> INT_T
+variable -> ID
+expression -> variable
+expression -> INT_C
+expression -> expression '+' expression %prec '+'
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> FLOAT_T
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '^' expression %prec '^'
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+type -> BOOL_T
+variable -> ID
+expression -> variable
+expression -> '!' expression %prec '!'
+declaration -> type ID '=' expression ';'
+declarations -> declarations declaration
+variable -> ID
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression AND expression %prec AND
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+expression -> TRUE_C
+expression -> expression OR expression %prec OR
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+expression -> variable
+expression -> TRUE_C
+expression -> expression EQ expression %prec EQ
+variable -> ID
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '*' expression %prec '*'
+variable -> ID
+expression -> variable
+variable -> ID
+expression -> variable
+expression -> expression '/' expression %prec '/'
+expression -> expression '+' expression %prec '+'
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+variable -> ID
+variable -> ID
+expression -> variable
+expression -> '!' expression %prec '!'
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+statement -> scope
+statement -> IF '(' expression ')' statement ELSE statement %prec HIGH
+statements -> statements statement
+variable -> ID
+expression -> variable
+expression -> TRUE_C
+expression -> expression NEQ expression %prec NEQ
+scope -> '{' declarations statements '}'
+statement -> scope
+statement -> WHILE '(' expression ')' statement
+statements -> statements statement
+expression -> TRUE_C
+expression -> TRUE_C
+variable -> ID
+expression -> INT_C
+statement -> variable '=' expression ';'
+statement -> WHILE '(' expression ')' statement
+statement -> WHILE '(' expression ')' statement
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+expression -> INT_C
+expression -> expression '>' expression %prec '>'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+expression -> INT_C
+expression -> expression '<' expression %prec '<'
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+expression -> INT_C
+expression -> expression GEQ expression %prec GEQ
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+expression -> INT_C
+expression -> expression LEQ expression %prec LEQ
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+expression -> INT_C
+expression -> expression NEQ expression %prec NEQ
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID
+expression -> variable
+expression -> TRUE_C
+expression -> expression EQ expression %prec EQ
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+variable -> ID '[' INT_C ']' %prec '['
+expression -> variable
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+function_name -> FUNC
+variable -> ID
+expression -> variable
+arguments -> expression
+variable -> ID
+expression -> variable
+arguments -> arguments ',' expression
+arguments_opt -> arguments
+function -> function_name '(' arguments_opt ')' %prec '('
+expression -> function
+statement -> variable '=' expression ';'
+statements -> statements statement
+variable -> ID
+function_name -> FUNC
+variable -> ID
+expression -> variable
+arguments -> expression
+variable -> ID
+expression -> variable
+arguments -> arguments ',' expression
+arguments_opt -> arguments
+function -> function_name '(' arguments_opt ')' %prec '('
+expression -> function
+function_name -> FUNC
+variable -> ID
+expression -> variable
+arguments -> expression
+arguments_opt -> arguments
+function -> function_name '(' arguments_opt ')' %prec '('
+expression -> function
+expression -> expression '+' expression %prec '+'
+expression -> '(' expression ')'
+function_name -> FUNC
+variable -> ID
+expression -> variable
+arguments -> expression
+arguments_opt -> arguments
+function -> function_name '(' arguments_opt ')' %prec '('
+expression -> function
+function_name -> FUNC
+variable -> ID
+expression -> variable
+arguments -> expression
+variable -> ID
+expression -> variable
+arguments -> arguments ',' expression
+arguments_opt -> arguments
+function -> function_name '(' arguments_opt ')' %prec '('
+expression -> function
+expression -> expression '*' expression %prec '*'
+expression -> expression '+' expression %prec '+'
+statement -> variable '=' expression ';'
+statements -> statements statement
+scope -> '{' declarations statements '}'
+program -> scope
