@@ -4,7 +4,6 @@
 
 #include "ast.h"
 #include "symbol.h"
-#include "linked_list.h"
 
 int assingmentType;
 
