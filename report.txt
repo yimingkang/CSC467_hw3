@@ -46,3 +46,10 @@ Challenges:
 ==========================================================
 tests
 the tests are located in tests/lab3_test/
+
+==========================================================
+implement functions
+AST gen
+ast_print
+ast_free
+semantic_check
