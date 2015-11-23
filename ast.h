@@ -51,6 +51,7 @@ typedef enum{
   BVEC_TYPE,
   FLOAT_TYPE,
   VEC_TYPE,
+  ANY_TYPE
 } type_name;
 
 typedef enum{

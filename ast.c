@@ -466,93 +466,220 @@ void ast_print(node * ast) {
     
       // Expression
       case FUNC_EXPRESSION_NODE:
-          printf("( CALL %s ", get_func(ast->func_expression_node.func_name));
-          ast_print(ast->func_expression_node.arguments_opt );
-          printf(")\n");
+          int func_code = ast->func_expression_node.func_name;
+          int over_1 = 0;
+          int over_2 = 0;
+          int over_3 = 0;
+          int over_4 = 0;
+            switch(func_code){
+                case 0:
+                    //dp3
+                    over_1 = arg_check(ast->func_expression_node.arguments_opt, (int)VEC_TYPE, 3, 2, sb_table, scope); // mult = 4, num of args = 2;
+                    over_2 = arg_check(ast->func_expression_node.arguments_opt, (int)VEC_TYPE, 2, 2, sb_table, scope); //mult = 3, num of args = 2;
+                    over_3 = arg_check(ast->func_expression_node.arguments_opt, (int)IVEC_TYPE, 3, 2, sb_table, scope); // mult = 4, num of args = 2;
+                    over_4 = arg_check(ast->func_expression_node.arguments_opt, (int)IVEC_TYPE, 2, 2, sb_table, scope); //mult = 3, num of args = 2;
+                    if (over_1 ==0 && over_2 ==0 && over_3==0 && over_4==0){
+                        printf("no overload for dp3 found\n");
+                    }
+
+                    ast_check_res res;
+                    if (over_1==1 || over_2==1){
+                        res.type.type_code = (int) FLOAT_TYPE;
+                        res.type.multiplicity = 0;
+                    }else if (over_3 ==1 || over_4 ==1){
+                        res.type.type_code = (int) INT_TYPE;
+                        res.type.multiplicity = 0;
+                    }else{
+                        res.type.type_code = (int) INT_TYPE;
+                        res.type.multiplicity = 0;
+                    }
+                    return res;
+
+                case 1:
+                    over_1 = arg_check(ast->func_expression_node.arguments_opt, (int)VEC_TYPE, 3, 2, sb_table, scope); // mult = 4, num of args = 2;
+                    if(over_1 ==0){
+                        printf("no overload for lit\n");
+                    }
+                    ast_check_res res;
+                    res.type.type_code = (int) VEC_TYPE;
+                    res.type.multiplicity = 3;
+                    return res; //lit
+                case 2:
+                    over_1 = arg_check(ast->func_expression_node.arguments_opt, (int)INT_TYPE, 0, 1, sb_table, scope); // mult = 0, num of args = 1;
+                    over_2 = arg_check(ast->func_expression_node.arguments_opt, (int)FLOAT_TYPE, 0, 1, sb_table, scope); // mult = 0, num of args = 1;
+                    if(over_1 ==0&&over_2==0){
+                        printf("no overload for lit\n");
+                    }
+                    ast_check_res res;
+                    res.type.type_code = (int) FLOAT_TYPE;
+                    res.type.multiplicity = 0;
+                    return res; //lit
+                default:
+                    printf ("unknow function \n");
+                    ast_check_res res;
+                    res.type.type_code = (int) ANY_TYPE;
+                    res.type.multiplicity = 0;
+                    return res; 
+            }
           break;
 
       case TYPE_EXPRESSION_NODE:
-          ast_print(ast->type_expression_node.type );
-          ast_print(ast->type_expression_node.arguments_opt );
+          ast_check_res type = ast_check(ast->type_expression_node.type, sb_table, scope );
+          int r = arg_check(ast->type_expression_node.arguments_opt, type.type.type_code, type.type.multiplicity, sb_table, scope);
+          if (r ==0){
+              printf("no overload for constructor of %s\n", type_str(type.type.type_code, type.type.multiplicity));
+          }
+          ast_check_res res;
+          res.type.type_code = type.type.type_code;
+          res.type.multiplicity = type.type.multiplicity;
+          return res;
           break;
 
       case BINARY_EXPRESSION_NODE:
-          printf("( BINARY ");
-          ast_print(ast->binary_expression_node.l_val);
+          ast_check_res l = ast_check(ast->binary_expression_node.l_val, sb_table, scope);
           printf(" %s ", bin_op_str(ast->binary_expression_node.op));
-          ast_print(ast->binary_expression_node.r_val);
-          printf(")");
+          as_check_res r = ast_check(ast->binary_expression_node.r_val, sb_table, scope);
+          switch(ast->binary_expression_node.op){
+              case PLUS_OP:
+              case MINUS_OP:
+              case AND_OP:
+              case OR_OP:
+              case EQ_OP:
+              case NEQ_OP:
+                 ast_check_res res;
+                 if (l.type.type_code != r.type.type_code || l.type.multiplicity != r.type.multiplicity){
+                     res.type.type_code = ANY_TYPE;
+                     res.type.multiplicity = 0;
+                     printf("operation cannot be done on mixed type\n");
+                     return res;
+                 }
+                 res.type.type_code = l.type.type_code;
+                 res.type.multiplicity = l.type.multiplicity;
+                 return res;
+              case DIV_OP:
+              case POW_OP:
+              case LT_OP:
+              case LEQ_OP:
+              case GT_OP:
+              case GEQ_OP:
+                 ast_check_res res;
+                 if (l.type.multiplicity>0 || r.type.multiplicity>0){
+                     res.type.type_code = ANY_TYPE;
+                     res.type.multiplicity = 0;
+                     printf("operation cannot be done on vectors\n");
+                     return res;
+                 }
+                 if (l.type.type_code != r.type.type_code){
+                     res.type.type_code = ANY_TYPE;
+                     res.type.multiplicity = 0;
+                     printf("operation cannot be done on mixed type\n");
+                     return res;
+                 }
+                 res.type.type_code = l.type.type_code;
+                 res.type.multiplicity = l.type.multiplicity;
+                 return res;
+                case MULT_OP:
+                 int l_s_type = to_s_type(l.type.type_code);
+                 int r_s_type = to_s_type(r.type.type_code);
+                 int l_m = l.type.multiplicity;
+                 int r_m = r.type.multiplicity;
+                 ast_check_res res;
+                 res.type.multiplicity = (l_m>r_m) ? l_m:r_m;
+                 if (l_m !=0 && r_m !=0 && l_m != r_m){
+                     printf("vector length does not match \n");
+                     res.type.multiplicity = 0;
+                 }
+                 res.type.type_code = to_v_type(l_s_type, res.type.multiplicity);
+                 if (l_s_type != r_s_type){
+                     printf("base type does not match \n");
+                     res.type.type_code = ANY_TYPE;
+                 }
+                 return res;
+                 
+          }
           break;
 
       case UNARY_EXPRESSION_NODE:
-          printf("( UNARY ");
           printf(" %s ", u_op_str(ast->unary_expression_node.op));
-          ast_print(ast->unary_expression_node.expression );
-          printf(")");
+          ast_check_res exp= ast_check(ast->unary_expression_node.expression, sb_table, scope);
+          ast_check_res res;
+          res.type.type_code = exp.type.type_code;
+          res.type.multiplicity = exp.type.multiplicity;
+          return res;
           break;
 
       case PAREN_EXPRESSION_NODE:
-          printf("( ");
-          ast_print(ast->paren_expression_node.expression );
-          printf(")");
+          return ast_check(ast->paren_expression_node.expression, sb_table, scope);
           break;
 
       case VARIABLE_EXPRESSION_NODE:
-          ast_print(ast->variable_expression_node.variable );
+          return ast_check(ast->variable_expression_node.variable, sb_table, scope);
           break;
 
       case LITERAL_EXPRESSION_NODE:
           //ast_print(ast->literal_expression_node.literal_type );
-          switch (ast->literal_expression_node.literal_type){
-              case INT_LITERAL:
-                  printf(" %d ", ast->literal_expression_node.literal_value.int_val);
-                  break;
 
-              case FLOAT_LITERAL:
-                  printf(" %f ", ast->literal_expression_node.literal_value.float_val);
-                  break;
-
-              case BOOL_LITERAL:
-                  printf(" %s ", ast->literal_expression_node.literal_value.bool_val ? "true" : "false");
-                  break;
-
-              default:
-                  //ERROR
-                  printf("!!!!!STOP, unrecognized literal in LITERAL_EXPRESSION_NODE\n");
-          }
+          ast_check_res res;
+          res.type.type_code = ast->literal_expression_node.literal_type;
+          res.type.multiplicity = 0;
+          return res;
           break;
     
       // variable
       case SINGULAR_VARIABLE: 
-          printf(" %s ", ast->singular_variable.id);
+          ast_check_res var = find_no_type(sb_table, ast->singular_variable.id, scope);
+          ast_check_res res;
+          if (var){
+                res.type.type_code = var.type.type_code;
+                res.type.multiplicity =0;
+                return res;
+         }else {
+             printf("variable %s is undefined\n", ast->singular_variable.id);
+            res.type.type_code = ANY_TYPE;
+            res.type.multiplicity = 0 ;
+            return res;
+         }
           break;
 
       case ARRAY_VARIABLE:
-          printf("( INDEX ");
-          printf(" %s ", ast->array_variable.id);
-          printf(" at_idx=%d", ast->array_variable.multiplicity);
-          printf(")");
+          ast_check_res var = find_no_type(sb_table, ast->array_variable.id, scope);
+          ast_check_res res;
+          if (ast->array_variable.multiplicity <0 || var.type.multiplicity > ast->array_variable.multiplicity){
+              printf("array index out of bound \n");
+        }
+          if (var){
+                res.type.type_code = var.type.type_code;
+                res.type.multiplicity =var.type.multiplicity;
+                return res;
+         }else {
+             printf("variable %s is undefined\n", ast->array_variable.id);
+            res.type.type_code = ANY_TYPE;
+            res.type.multiplicity = 0 ;
+            return res;
+         }
           break;
     
       // ast_print(arguments
       case BINARY_ARGUMENT:
-          ast_print(ast->binary_arguments.arguments );
-          ast_print(ast->binary_arguments.expression );
+          return NULL; //not handled here
           break;
 
       case UNARY_ARGUMENT:
-          ast_print(ast->unary_argument.expression );
+          return NULL;
           break;
+
     
       // ast_print(argument_opt
       case ARGUMENT_OPT:
-          ast_print(ast->arguments_opt.arguments );
+          return NULL;
           break;
     
       // type
       case TYPE:
-          printf(" type=%s ", type_str(ast->type.var_type, ast->type.multiplicity));
-          //ast_print(ast->type.multiplicity );
+          ast_check_res res;
+          res.type.type_code = ast->type.var_type;
+          res.type.multiplicity = ast->type.multiplicity;
+          return res;
           break;
     
       case UNKNOWN:
@@ -659,4 +786,319 @@ char *get_func(int func_code){
         default:
             return "UNKOWN_FUNC";
     }
+}
+
+struct {
+    union{
+        symbol* sb_table; // returned by declaration/declarations 
+        struct {  //returned by expression/variable/type
+            int type_code;
+            int multiplicity;
+        } type;
+    };
+}ast_check_res;
+
+int arg_check(node * ast, int type_code, int mult, symbol* sb_table, int scope){
+    if (ast==NULL)
+        return;
+    int kind = ast->kind;
+    switch(kind){
+
+      case BINARY_ARGUMENT:
+          int r = arg_check(ast->binary_arguments.arguments, type_code,mult, sb_table, scope);
+          ast_check_res exp = ast_check(ast->unary_argument.expression, sb_table, scope);
+          if (exp.type.type_code == type_code && exp.type.multiplicity == mult){
+              return 1|r;
+          } else{
+              return 0|r;
+        }
+          break;
+
+      case UNARY_ARGUMENT:
+          ast_check_res exp = ast_check(ast->unary_argument.expression, sb_table, scope);
+          if (exp.type.type_code == type_code && exp.type.multiplicity == mult){
+              return 1;
+          } else{
+              return 0;
+        }
+          break;
+    
+      // ast_print(argument_opt
+      case ARGUMENT_OPT:
+          return arg_check(ast->arguments_opt.arguments, type_code, mult, sb_table,scope);
+          break;
+    }
+
+}
+
+int find(symbol* sb_table, int type_code, int mult, char* id, int scope){
+    symbol* head = sb_table;
+    while ( head !=NULL){
+        if (head->scope !=scope )
+            return 0;
+        if (type_code == head->type_code && mult == head->mult && strcmp(id, head->id)==0){
+            return 1;
+    }
+        head = head->prev;
+    }
+    return 0;
+}
+ast_check_res find_no_type(symbol* sb_table, char* id, int scope){
+    symbol* head = sb_table;
+    while ( head !=NULL){
+        if (strcmp(id, head->id)==0){
+           ast_check_res res;
+          res.type.type_code = head->type_code;
+         res.type.multiplicity = head->mult; 
+    }
+        head = head->prev;
+    }
+    return NULL;
+    
+
+}
+
+symbol*  add_to_table(symbol* sb_table,int type_code,int mult, char* id, int scope, SYMBOL_ATTRIBUTE  attr){
+    symbol* new_s = malloc(sizeof(symbol));
+    new_s ->type_code = type_code;
+    new_s->id = id;
+    new_s->symbol_attribute = (int) attr;
+    new_s->prev = sb_table;
+    return new_s;
+}
+void ast_check(node * ast, symbol* sb_table,int scope){
+    
+    if(ast==NULL)
+        return;
+
+    int kind;
+
+    kind = ast->kind;
+
+    switch(kind){
+      // program
+      case PROGRAM:
+          return ast_check->(ast->program.scope, sb_table, scope);
+          break;
+    
+      // scope
+      case SCOPE:
+          ast_check_res res = ast_check(ast->scope.declarations, sb_table, scope+1);
+          symbol* new_table = res.sb_table;
+          ast_print(ast->scope.statements, new_table, scope+1);
+          //remove_sb_table(new_table, sb_table);
+          return NULL;
+          break;
+    
+      // declarations
+      case DECLARATIONS: // includes null
+          if (ast->declarations.declarations!=NULL){
+                ast_check_res res = ast_check(ast->declarations.declarations, sb_table, scope);//depth first search
+                sb_table = res.sb_table;
+          }
+          ast_check(ast->declarations.declaration, sb_table, scope);
+          break;
+    
+      // statements:
+      case STATEMENTS: // includes null
+          printf("( STATEMENTS \n");
+          ast_print(ast->statements.statements );
+          ast_print(ast->statements.statement );
+          printf(")\n");
+          break;
+    
+      // declaration
+      case DECLARATION:
+          ast_check_res res = ast_check(ast->declaration.type,sb_table, scope);
+          int typecode = res.type.type_code;
+          int mult = res.type.multiplicity;
+          if (find (sb_table, typecode, ast->declaration.id, scope)){
+                printf("duplicated declaration of %s\n",ast->declaration.id);
+          }else{
+                sb_table = add_to_table(sb_table, typecode,mult, ast->declaration.id,scope, NONE);
+          }
+          ast_check_res res;
+          res.sb_table = sb_table;
+          return ast_check_res;
+          break;
+
+      case INITIALIZED_DECLARATION:
+          ast_check_res res = ast_check(ast->declaration.type,sb_table, scope);
+          int typecode = res.type.type_code;
+          int mult = res.type.multiplicity;
+          if (find (sb_table, typecode, ast->declaration.id, scope)){
+                printf("duplicated declaration of %s\n",ast->declaration.id);
+          }else{
+                ast_check_res exp_res = ast_check(ast->declaration.expression, sb_table, scope);
+                int exp_type = exp_res.type.type_code;
+                int exp_mult = exp_res.type.muliplicity;
+                if (exp_type != typecode || exp_mult !=mult){
+                    printf ("expression type %s cannot be assigned to %s\n", type_str(exp_type,exp_mult),type_str(typecode,mult));
+                }
+                sb_table = add_to_table(sb_table, typecode,mult, ast->declaration.id,scope, NONE);
+          }
+          ast_check_res res;
+          res.sb_table = sb_table;
+          return ast_check_res;
+          break;
+
+      case CONST_DECLARATION:
+          ast_check_res res = ast_check(ast->declaration.type,sb_table, scope);
+          int typecode = res.type.type_code;
+          int mult = res.type.multiplicity;
+          if (find (typecode, mult, ast->declaration.id, scope)){
+                printf("duplicated declaration of %s\n",ast->declaration.id);
+          }else{
+                ast_check_res exp_res = ast_check(ast->declaration.expression, sb_table, scope);
+                int exp_type = exp_res.type.type_code;
+                int exp_mult = exp_res.type.muliplicity;
+                if (exp_type != typecode || exp_mult !=mult){
+                    printf ("expression type %s cannot be assigned to %s\n", type_str(exp_type,exp_mult),type_str(typecode,mult));
+                }
+                sb_table = add_to_table(sb_table, typecode,mult, ast->declaration.id,scope, UNIFORM);
+          }
+          ast_check_res res;
+          res.sb_table = sb_table;
+          return ast_check_res;
+          break;
+    
+      // statement
+      case ASSIGNMENT_STATEMENT:
+          ast_check_res var = ast_check(ast->assignment_statement.variable,sb_table, scope);
+          ast_check_res exp = ast_check(ast->assignment_statement.expression,sb_table,scope);
+          if (var.type.type_code != exp.type.type_code || var.type.multiplicity != exp.type.multiplicity){
+              printf("expression type %s cannot be assigned to %s\n", type_str(exp.type.type_code, var.type.multiplicity));
+          }
+          return NULL;
+          break;
+
+      case IF_ELSE_STATEMENT:
+          ast_check_res exp = ast_check(ast->if_else_statement.if_condition,sb_table,scope );
+          if (exp.type.type_code !=(int) BOOL_TYPE){
+              printf("if condition must evaluate to boolean\n");
+          }
+          ast_check(ast->if_else_statement.statement, sb_table, scope );
+          ast_check(ast->if_else_statement.else_statement, sb_table, scope );
+          return NULL;
+          break;
+
+      case IF_STATEMENT:
+          ast_check_res exp = ast_check(ast->if_else_statement.if_condition,sb_table,scope );
+          if (exp.type.type_code !=(int) BOOL_TYPE){
+              printf("if condition must evaluate to boolean\n");
+          }
+          ast_check(ast->if_else_statement.statement, sb_table, scope );
+          return NULL;
+          break;
+
+      case SCOPE_STATEMENT:
+          ast_check(ast->scope_statement.scope,sb_table, scope);
+          return NULL;
+          break;
+
+      case SEMICOLEN_STATEMENT:
+          //not used
+          return NULL;
+          break;
+    
+      // Expression
+      case FUNC_EXPRESSION_NODE:
+          printf("( CALL %s ", get_func(ast->func_expression_node.func_name));
+          ast_print(ast->func_expression_node.arguments_opt );
+          printf(")\n");
+          break;
+
+      case TYPE_EXPRESSION_NODE:
+          ast_print(ast->type_expression_node.type );
+          ast_print(ast->type_expression_node.arguments_opt );
+          break;
+
+      case BINARY_EXPRESSION_NODE:
+          printf("( BINARY ");
+          ast_print(ast->binary_expression_node.l_val);
+          printf(" %s ", bin_op_str(ast->binary_expression_node.op));
+          ast_print(ast->binary_expression_node.r_val);
+          printf(")");
+          break;
+
+      case UNARY_EXPRESSION_NODE:
+          printf("( UNARY ");
+          printf(" %s ", u_op_str(ast->unary_expression_node.op));
+          ast_print(ast->unary_expression_node.expression );
+          printf(")");
+          break;
+
+      case PAREN_EXPRESSION_NODE:
+          printf("( ");
+          ast_print(ast->paren_expression_node.expression );
+          printf(")");
+          break;
+
+      case VARIABLE_EXPRESSION_NODE:
+          ast_print(ast->variable_expression_node.variable );
+          break;
+
+      case LITERAL_EXPRESSION_NODE:
+          //ast_print(ast->literal_expression_node.literal_type );
+          switch (ast->literal_expression_node.literal_type){
+              case INT_LITERAL:
+                  printf(" %d ", ast->literal_expression_node.literal_value.int_val);
+                  break;
+
+              case FLOAT_LITERAL:
+                  printf(" %f ", ast->literal_expression_node.literal_value.float_val);
+                  break;
+
+              case BOOL_LITERAL:
+                  printf(" %s ", ast->literal_expression_node.literal_value.bool_val ? "true" : "false");
+                  break;
+
+              default:
+                  //ERROR
+                  printf("!!!!!STOP, unrecognized literal in LITERAL_EXPRESSION_NODE\n");
+          }
+          break;
+    
+      // variable
+      case SINGULAR_VARIABLE: 
+          printf(" %s ", ast->singular_variable.id);
+          break;
+
+      case ARRAY_VARIABLE:
+          printf("( INDEX ");
+          printf(" %s ", ast->array_variable.id);
+          printf(" at_idx=%d", ast->array_variable.multiplicity);
+          printf(")");
+          break;
+    
+      // ast_print(arguments
+      case BINARY_ARGUMENT:
+          ast_print(ast->binary_arguments.arguments );
+          ast_print(ast->binary_arguments.expression );
+          break;
+
+      case UNARY_ARGUMENT:
+          ast_print(ast->unary_argument.expression );
+          break;
+    
+      // ast_print(argument_opt
+      case ARGUMENT_OPT:
+          ast_print(ast->arguments_opt.arguments );
+          break;
+    
+      // type
+      case TYPE:
+          printf(" type=%s ", type_str(ast->type.var_type, ast->type.multiplicity));
+          //ast_print(ast->type.multiplicity );
+          break;
+    
+      case UNKNOWN:
+      default:
+        printf("!!!!!STOP, unknown type!\n");
+        break;
+  }
+
+
+
+
 }
