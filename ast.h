@@ -3,6 +3,7 @@
 #define AST_H_ 1
 
 #include <stdarg.h>
+#include "symbol.h"
 
 // Dummy node just so everything compiles, create your own node/nodes
 //
@@ -117,6 +118,7 @@ struct node_ {
 
   // an example of tagging each node with a type
   node_kind kind;
+  int linenum;
 
   union {
     struct {
@@ -248,8 +250,18 @@ struct node_ {
   };
 };
 
+struct ast_check_res {
+    int invalid;
+    union{
+        symbol* sb_table; // returned by declaration/declarations 
+        struct {  //returned by expression/variable/type
+            int type_code;
+            int multiplicity;
+        } type;
+    };
+};
 node *ast_allocate(node_kind type, ...);
 void ast_free(node *ast);
 void ast_print(node * ast);
-
+ast_check_res ast_check(node* ast,symbol* sb_table, int scope);
 #endif /* AST_H_ */

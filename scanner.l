@@ -31,7 +31,6 @@ int yyline = 1;
 
 %}
 %option noyywrap
-
 %%
 
 "/*"                          { if(!ParseComment()) { yyterminate(); } }

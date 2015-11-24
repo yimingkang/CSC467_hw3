@@ -3,26 +3,24 @@
 
 
 
-enum{
-    RESULT;
-    ATTRIBUTE;
-    UNIFORM;
-    NONE;
+typedef enum{
+    RESULT,
+    ATTRIBUTE,
+    UNIFORM,
+    NONE,
 
 
-} SYMBOL_ATTRIBUTE;
+} symbol_attribute;
 
 struct symbol{
     int type_code;
+    int mult;
+    int scope;
     char* id;
     symbol* prev;
-    symbol_attribute;
-} symbol;
+    int attr;
+};
 
-
-int get_multiplicity(int type_code){
-    return type_code & ;
-}
 
 
 
