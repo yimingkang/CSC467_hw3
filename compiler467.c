@@ -86,8 +86,8 @@ int main (int argc, char *argv[]) {
   if(1 == yyparse()) {
     return 0; // parse failed
   }
-
-  ast_check(ast, NULL, 0);
+  symbol* s = init_symbol_table();
+  ast_check(ast,s, 0);
 /* Phase 3: Call the AST dumping routine if requested */
   if (dumpAST)
     ast_print(ast);

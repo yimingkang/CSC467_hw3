@@ -257,6 +257,7 @@ struct ast_check_res {
         struct {  //returned by expression/variable/type
             int type_code;
             int multiplicity;
+            int attr;
         } type;
     };
 };
@@ -264,4 +265,5 @@ node *ast_allocate(node_kind type, ...);
 void ast_free(node *ast);
 void ast_print(node * ast);
 ast_check_res ast_check(node* ast,symbol* sb_table, int scope);
+symbol* init_symbol_table();
 #endif /* AST_H_ */

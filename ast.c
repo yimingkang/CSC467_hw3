@@ -665,6 +665,20 @@ char *u_op_str(int op_code){
     }
 }
 
+char *attr_string(int attr){
+    switch(attr){
+        case RESULT:
+            return "result";
+        case ATTRIBUTE:
+            return "attribute";
+        case UNIFORM:
+            return "uniform/const";
+        case NONE:
+            return "none";
+        default:
+            return "unknown_attr";
+    }
+}
 char *type_str(int type_code, int multiplicity){
     switch(type_code){
         case INT_TYPE:
@@ -792,7 +806,7 @@ ast_check_res find_no_type(symbol* sb_table, char* id, int scope){
            ast_check_res res;
            res.invalid = 0;
           res.type.type_code = head->type_code;
-     //     res.type.attr = head->attr;
+           res.type.attr = head->attr;
          res.type.multiplicity = head->mult; 
          return res;
     }
@@ -802,6 +816,7 @@ ast_check_res find_no_type(symbol* sb_table, char* id, int scope){
     res.invalid = 1;
     return res;
 }
+
 
 symbol*  add_to_table(symbol* sb_table,int type_code,int mult, char* id, int scope, int  attr){
     symbol* new_s = (symbol*)malloc(sizeof(symbol));
@@ -814,6 +829,24 @@ symbol*  add_to_table(symbol* sb_table,int type_code,int mult, char* id, int sco
     return new_s;
 }
 
+symbol* init_symbol_table(){
+    symbol* s = NULL;
+    s = add_to_table(s, VEC_TYPE, 3, "gl_FragColor",0, RESULT);
+    s = add_to_table(s, BOOL_TYPE, 0, "gl_FragDepth",0, RESULT);
+    s = add_to_table(s, VEC_TYPE, 3, "gl_FragCoord",0, RESULT);
+    s = add_to_table(s, VEC_TYPE, 3, "gl_TexCoord",0, ATTRIBUTE);
+    s = add_to_table(s, VEC_TYPE, 3, "gl_Color",0, ATTRIBUTE);
+    s = add_to_table(s, VEC_TYPE, 3, "gl_Secondary",0, ATTRIBUTE);
+    s = add_to_table(s, VEC_TYPE, 3, "gl_FogFragCoord",0, ATTRIBUTE);
+    s = add_to_table(s, VEC_TYPE, 3, "gl_Light_Half",0, UNIFORM);
+    s = add_to_table(s, VEC_TYPE, 3, "gl_Light_Ambient",0, UNIFORM);
+    s = add_to_table(s, VEC_TYPE, 3, "gl_Material_Shininess",0, UNIFORM);
+    s = add_to_table(s, VEC_TYPE, 3, "env1",0, NONE);
+    s = add_to_table(s, VEC_TYPE, 3, "env2",0, NONE);
+    s = add_to_table(s, VEC_TYPE, 3, "env3",0, NONE);
+    return s;
+
+}
 ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
     
     if(ast==NULL){
@@ -960,11 +993,15 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
           {
           ast_check_res var = ast_check(ast->assignment_statement.variable,sb_table, scope);
           ast_check_res exp = ast_check(ast->assignment_statement.expression,sb_table,scope);
-         /* if (var.type.attr == UNIFORM){
-                printf("Line %d, CONST cannot be assigned to\n", ast->linenum);
-          }*/
-          if (var.type.type_code != exp.type.type_code || var.type.multiplicity != exp.type.multiplicity){
-              printf("Line %d: expression type %s cannot be assigned to %s\n", ast->linenum, type_str(exp.type.type_code, exp.type.multiplicity), type_str(var.type.type_code, var.type.multiplicity));
+          if (var.invalid ==0){
+              if (var.type.attr == UNIFORM ||var.type.attr == ATTRIBUTE){
+                    printf("Line %d, %s cannot be assigned to\n", ast->linenum, attr_string(var.type.attr) );
+              }
+              if (var.type.type_code !=ANY_TYPE && exp.type.type_code !=ANY_TYPE){
+                  if (var.type.type_code != exp.type.type_code ||  var.type.multiplicity != exp.type.multiplicity){
+                      printf("Line %d: expression type %s cannot be assigned to %s\n", ast->linenum, type_str(exp.type.type_code, exp.type.multiplicity), type_str(var.type.type_code, var.type.multiplicity));
+                  }
+              }
           }
           ast_check_res res;
           res.invalid = 1;
@@ -1038,6 +1075,7 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
 
                     ast_check_res res;
                     res.invalid = 0 ;
+                    res.type.attr = NONE;
                     if (over_1==1 || over_2==1){
                         res.type.type_code = (int) FLOAT_TYPE;
                         res.type.multiplicity = 0;
@@ -1045,7 +1083,7 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
                         res.type.type_code = (int) INT_TYPE;
                         res.type.multiplicity = 0;
                     }else{
-                        res.type.type_code = (int) INT_TYPE;
+                        res.type.type_code = (int) ANY_TYPE;
                         res.type.multiplicity = 0;
                     }
                     return res;
@@ -1053,13 +1091,14 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
 
                 case 1:
                     {
-                    over_1 = arg_check(ast->func_expression_node.arguments_opt, (int)VEC_TYPE, 3, 2, sb_table, scope); // mult = 4, num of args = 2;
+                    over_1 = arg_check(ast->func_expression_node.arguments_opt, (int)VEC_TYPE, 3, 1, sb_table, scope); // mult = 4, num of args = 2;
                     if(over_1 ==0){
                         printf("Line %d: no overload for lit\n", ast->linenum);
                     }
                     ast_check_res res;
                     res.invalid = 0;
                     res.type.type_code = (int) VEC_TYPE;
+                    res.type.attr = NONE;
                     res.type.multiplicity = 3;
                     return res; //lit
                     }
@@ -1073,8 +1112,9 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
                     ast_check_res res;
                     res.invalid = 0;
                     res.type.type_code = (int) FLOAT_TYPE;
+                    res.type.attr = NONE;
                     res.type.multiplicity = 0;
-                    return res; //lit
+                    return res; //rsq
                     }
                 default:
                     {
@@ -1083,6 +1123,7 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
                     res.type.type_code = (int) ANY_TYPE;
                     res.type.multiplicity = 0;
                     res.invalid = 0;
+                    res.type.attr = NONE;
                     return res; 
                     }
             }
@@ -1100,6 +1141,7 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
           ast_check_res res;
           res.invalid = 0;
           res.type.type_code = type.type.type_code;
+          res.type.attr = NONE;
           res.type.multiplicity = type.type.multiplicity;
           return res;
           break;
@@ -1111,6 +1153,7 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
           ast_check_res r = ast_check(ast->binary_expression_node.r_val, sb_table, scope);
           ast_check_res res;
           res.invalid  = 0;
+          res.type.attr = NONE;
           //check oprand types
           switch(ast->binary_expression_node.op){
               case PLUS_OP:
@@ -1270,6 +1313,7 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
           res.invalid = 0;
           res.type.type_code = exp.type.type_code;
           res.type.multiplicity = exp.type.multiplicity;
+          res.type.attr = NONE;
           return res;
           break;
           }
@@ -1279,8 +1323,13 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
           break;
 
       case VARIABLE_EXPRESSION_NODE:
-          return ast_check(ast->variable_expression_node.variable, sb_table, scope);
-          break;
+          {
+          ast_check_res res = ast_check(ast->variable_expression_node.variable, sb_table, scope);
+          if (res.type.attr == RESULT){
+              printf("Line %d: %s is write only, cannot be read\n", ast->linenum, attr_string(res.type.attr));
+            }
+          return res;
+          }
 
       case LITERAL_EXPRESSION_NODE:
           {
@@ -1290,6 +1339,7 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
           res.invalid = 0;
           res.type.type_code = literal_type_to_data_type(ast->literal_expression_node.literal_type);
           res.type.multiplicity = 0;
+          res.type.attr = NONE;
           return res;
           break;
           }
@@ -1302,13 +1352,15 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
           if (var.invalid==0){
                 res.invalid = 0;
                 res.type.type_code = var.type.type_code;
-                res.type.multiplicity =0;
+                res.type.multiplicity = var.type.multiplicity;
+                res.type.attr = var.type.attr;
                 return res;
          }else {
              printf("Line %d: variable %s is undefined\n",ast->linenum, ast->singular_variable.id);
             res.invalid = 0;
             res.type.type_code = ANY_TYPE;
             res.type.multiplicity = 0 ;
+            res.type.attr = NONE;
             return res;
          }
           break;
@@ -1319,17 +1371,19 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
           ast_check_res var = find_no_type(sb_table, ast->array_variable.id, scope);
           ast_check_res res;
           res.invalid = 0;
-          if (ast->array_variable.multiplicity <0 || var.type.multiplicity > ast->array_variable.multiplicity){
+          if (ast->array_variable.multiplicity <0 || var.type.multiplicity < ast->array_variable.multiplicity){
               printf("Line %d: array index out of bound \n", ast->linenum);
         }
           if (var.invalid==0){
-                res.type.type_code = var.type.type_code;
-                res.type.multiplicity =var.type.multiplicity;
+                res.type.type_code =to_s_type(var.type.type_code);
+                res.type.multiplicity =0;
+                res.type.attr = var.type.attr;
                 return res;
          }else {
              printf("Line %d: variable %s is undefined\n", ast->linenum, ast->array_variable.id);
             res.type.type_code = ANY_TYPE;
             res.type.multiplicity = 0 ;
+            res.type.attr = NONE;
             return res;
          }
           break;
@@ -1364,6 +1418,7 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
           res.invalid= 0;
           res.type.type_code = ast->type.var_type;
           res.type.multiplicity = ast->type.multiplicity;
+          res.type.attr = NONE;
           return res;
           break;
           }
