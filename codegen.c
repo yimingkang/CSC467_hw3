@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "codegen.h"
-#include "ast.h"
 
 #define DEBUG
 
@@ -20,7 +19,7 @@ int genCode(node *ast){
     }
     #endif 
     int kind = ast->kind;
-    return;
+    return kind;
 }
 
 void print(const char *fmt, ...){

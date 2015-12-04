@@ -86,7 +86,7 @@ int main (int argc, char *argv[]) {
   if(1 == yyparse()) {
     return 0; // parse failed
   }
-  symbol* s = init_symbol_table();
+  struct symbol* s = init_symbol_table();
   ast_check(ast,s, 0);
 /* Phase 3: Call the AST dumping routine if requested */
   if (dumpAST)
@@ -98,7 +98,6 @@ int main (int argc, char *argv[]) {
     fprintf(outputFile,"Failed to compile\n");
   else 
     genCode(ast);
-    ;
 /***********************************************************************
  * Post Compilation Cleanup
  **********************************************************************/
