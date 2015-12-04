@@ -9,11 +9,12 @@ int semantic_check( node *ast) {
 
     int kind = ast->kind;
     int scope_depth = 0;
+    int val;
 
     switch(kind){
         case PROGRAM:
             scope_depth++; 
-            int val = semantic_check(ast->program.scope);
+            val = semantic_check(ast->program.scope);
             scope_depth--; 
             return val;
 
