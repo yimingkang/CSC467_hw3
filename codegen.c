@@ -8,7 +8,7 @@
 
 FILE *output_file = NULL; 
 
-void gen_code(node *ast){
+int genCode(node *ast){
     #ifndef DEBUG
     if (!output_file){
         // do all the init work here
@@ -20,8 +20,7 @@ void gen_code(node *ast){
     }
     #endif 
     int kind = ast->kind;
-
-
+    return;
 }
 
 void print(const char *fmt, ...){
@@ -37,6 +36,8 @@ void print(const char *fmt, ...){
 }
 
 
+/*
 int main(){
     print("This is a test %d\n", 0);
 }
+*/
