@@ -253,7 +253,7 @@ struct node_ {
 struct ast_check_res {
     int invalid;
     union{
-        symbol* sb_table; // returned by declaration/declarations 
+        struct symbol* sb_table; // returned by declaration/declarations 
         struct {  //returned by expression/variable/type
             int type_code;
             int multiplicity;
@@ -264,6 +264,6 @@ struct ast_check_res {
 node *ast_allocate(node_kind type, ...);
 void ast_free(node *ast);
 void ast_print(node * ast);
-ast_check_res ast_check(node* ast,symbol* sb_table, int scope);
-symbol* init_symbol_table();
+struct ast_check_res ast_check(node* ast,struct symbol* sb_table, int scope);
+struct symbol* init_symbol_table();
 #endif /* AST_H_ */

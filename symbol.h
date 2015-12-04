@@ -17,7 +17,7 @@ struct symbol{
     int mult;
     int scope;
     char* id;
-    symbol* prev;
+    struct symbol* prev;
     int attr;
 };
 
