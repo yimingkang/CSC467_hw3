@@ -26,6 +26,10 @@ registers_t *register_stack(char *header){
     return new_reg;
 }
 
+int next_alloc(registers_t *reg_stack){
+    return reg_stack->size;
+}
+
 void dealloc(registers_t *register_stack, int reg_number){
     // deallocates registers up to register number reg_number (inclusive)
     assert(register_stack != NULL);
@@ -100,7 +104,7 @@ void print_registers(registers_t* reg_stack){
     puts("");
 }
 
-int main(){
+int reg_test(){
     registers_t *new_regs = register_stack("mystack");
     int i, reg_number;
     reg_number = allocate(new_regs, "R100");
@@ -126,4 +130,15 @@ int main(){
         print_registers(new_regs);
     }
     free_registers(new_regs);
+}
+
+char *get_name_by_reg_num(registers_t *reg_stack, int id){
+    reg_t *node = reg_stack->head;
+    while (node && head->reg_number != id){
+        node = node->next;
+    }
+
+    // Not found ---> this is bad
+    assert(node != NULL);
+    return node->id;
 }

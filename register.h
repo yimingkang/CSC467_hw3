@@ -13,6 +13,7 @@ typedef struct registers{
     struct reg* head;
 }registers_t;
 
+int next_alloc(registers_t *);
 void free_registers(registers_t *);
 registers_t *register_stack();
 void dealloc(registers_t *, int);
@@ -21,5 +22,6 @@ int find(registers_t *, char *);
 int allocate(registers_t *, char *);
 reg_t* _allocate();
 reg_t *find_node(registers_t *, char *);
+char *get_name_by_reg_num(registers_t*, int);
 
 #endif
