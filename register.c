@@ -2,18 +2,13 @@
  * Register allocation, search and deallocation
  *
  */
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 #include <string.h>
 
-typedef struct reg{
-    char *id;
-    int reg_number;
-    struct reg* next;
-}reg_t;
+#include "register.h"
 
-typedef registers{
-   size_t size;
-   struct reg* head;
-}registers_t;
 
 void free_registers(registers_t *register_stack){
     assert(register_stack != NULL);
@@ -21,12 +16,14 @@ void free_registers(registers_t *register_stack){
     free(register_stack);
 }
 
-registers_t *register_stack(){
+registers_t *register_stack(char *header){
     registers_t *new_reg = malloc(sizeof(registers_t));
     assert(new_reg != NULL);
 
     new_reg->head = NULL;
     new_reg->size = 0;
+    new_reg->header = header;
+    return new_reg;
 }
 
 void dealloc(registers_t *register_stack, int reg_number){
@@ -57,16 +54,20 @@ void _recursive_free(reg_t *node){
     free(node);
 }
 
-int find(registers_t *register_stack, char *id){
-    int reg_number = -1;
+reg_t *find_node(registers_t *register_stack, char *id){
     reg_t *head = register_stack->head;
     while (head && strcmp(id, head->id) != 0){
         head = head->next;
     }
+    return head;
+}
+
+int find(registers_t *register_stack, char *id){
+    reg_t *head = find_node(register_stack, id);
     if (head){
-        reg_number = head->reg_number;
+        return head->reg_number;
     }
-    return reg_number;
+    return -1;
 }
 
 int allocate(registers_t *register_stack, char *id){
@@ -90,18 +91,39 @@ reg_t* _allocate(){
     return new_reg;
 }
 
+void print_registers(registers_t* reg_stack){
+    reg_t *node = reg_stack->head;
+    while (node){
+        printf("%s|", node->id);
+        node = node->next;
+    }
+    puts("");
+}
+
 int main(){
-    registers_t *new_regs = register_stack();
+    registers_t *new_regs = register_stack("mystack");
     int i, reg_number;
-    for (i = 0; i < 50; i++){
-        reg_number = allocate(new_reg, "MY REG 1");
+    reg_number = allocate(new_regs, "R100");
+    reg_number = allocate(new_regs, "R99");
+    reg_number = allocate(new_regs, "R98");
+    for (i = 0; i < 20; i++){
+        reg_number = allocate(new_regs, "R1");
         printf("Register number is %d\n", reg_number);
-        reg_number = allocate(new_reg, "MY REG 2");
+        reg_number = allocate(new_regs, "R2");
         printf("Register number is %d\n", reg_number);
     }
-    for (i = 0; i < 49; i++){
-        reg_number = find(new_reg, "MY REG 1");
-        printf("Register number found at %d\n", reg_number);
+    print_registers(new_regs);
+    reg_number = find(new_regs, "R98");
+    printf("Register number found for %s is %d\n", "R98", reg_number);
+    reg_number = find(new_regs, "R99");
+    printf("Register number found for %s is %d\n", "R99", reg_number);
+    reg_number = find(new_regs, "R100");
+    printf("Register number found for %s is %d\n", "R100", reg_number);
+    for (i = 10; i >= 0; i--){
+        dealloc(new_regs, i);
+        int size = new_regs->size;
+        printf("Register dealloced%d, size remaining is %d\n", i, size);
+        print_registers(new_regs);
     }
-    free_registers(new_reg);
+    free_registers(new_regs);
 }
