@@ -27,32 +27,32 @@ int genCode(node *ast){
 
     switch (kind){
         case PROGRAM:
-           genCode(ast->scope);
+           genCode(ast->program.scope);
            break;
         case SCOPE:
            scope_level += 1;
-           left = genCode(ast->declarations);
-           right = genCode(ast->statements);
+           left = genCode(ast->scope.declarations);
+           right = genCode(ast->scope.statements);
            if (left != -1 && right != -1){
                 return 0;
            }
            return -1;
         case DECLARATIONS:
-           left = genCode(ast->declarations);
-           right = genCode(ast->declaration);
+           left = genCode(ast->declarations.declarations);
+           right = genCode(ast->declarations.declaration);
            if (left != -1 && right != -1){
                 return 0;
            }
            return -1;
         case STATEMENTS:
-           left = genCode(ast->statements);
-           right = genCode(ast->statement);
+           left = genCode(ast->statements.statements);
+           right = genCode(ast->statements.statement);
            if (left != -1 && right != -1){
                 return 0;
            }
            return -1;
         case DECLARATION:
-            
+            break;
         case
         case
         case
