@@ -46,6 +46,13 @@ typedef enum {
 } binary_op;
 
 typedef enum{
+    DP3,
+    DP4,
+    RSQ,
+    LIT
+}func_names;
+
+typedef enum{
   INT_TYPE,
   IVEC_TYPE,
   BOOL_TYPE,

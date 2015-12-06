@@ -792,7 +792,7 @@ int find(symbol* sb_table, int type_code, int mult, char* id, int scope){
     while ( head !=NULL){
         if (head->scope !=scope )
             return 0;
-        if (type_code == head->type_code && mult == head->mult && strcmp(id, head->id)==0){
+        if (strcmp(id, head->id)==0){
             return 1;
     }
         head = head->prev;
@@ -1073,6 +1073,12 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
                         printf("Line %d: no overload for dp3 found\n", ast->linenum);
                     }
 
+                    if (over_1==1|| over_3==1){
+                        ast->func_expression_node.func_name = DP4;
+                    }else if (over_2==1 || over_4==1){
+                        ast->func_expression_node.func_name = DP3;
+                    }
+
                     ast_check_res res;
                     res.invalid = 0 ;
                     res.type.attr = NONE;
@@ -1092,6 +1098,7 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
                 case 1:
                     {
                     over_1 = arg_check(ast->func_expression_node.arguments_opt, (int)VEC_TYPE, 3, 1, sb_table, scope); // mult = 4, num of args = 2;
+                    ast->func_expression_node.func_name = LIT;
                     if(over_1 ==0){
                         printf("Line %d: no overload for lit\n", ast->linenum);
                     }
@@ -1106,6 +1113,7 @@ ast_check_res ast_check(node * ast, symbol* sb_table,int scope){
                     {
                     over_1 = arg_check(ast->func_expression_node.arguments_opt, (int)INT_TYPE, 0, 1, sb_table, scope); // mult = 0, num of args = 1;
                     over_2 = arg_check(ast->func_expression_node.arguments_opt, (int)FLOAT_TYPE, 0, 1, sb_table, scope); // mult = 0, num of args = 1;
+                    ast->func_expression_node.func_name = RSQ;
                     if(over_1 ==0&&over_2==0){
                         printf("Line %d: no overload for lit\n", ast->linenum);
                     }

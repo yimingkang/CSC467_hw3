@@ -2,12 +2,12 @@
 #define __REGISTER_H
 // REGISTERS
 typedef struct reg{
-    char *id;
-    int reg_number;
+    char *sb_id; //represents symbol id
+    int reg_number; 
     struct reg* next;
 }reg_t;
 
-typedef struct registers{
+typedef struct registers{ 
     char *header;
     size_t size;
     struct reg* head;
