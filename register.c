@@ -1,14 +1,9 @@
-/*
- * Register allocation, search and deallocation
- *
- */
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+
 #include <string.h>
-
 #include "register.h"
-
 
 void free_registers(registers_t *register_stack){
     assert(register_stack != NULL);
@@ -17,7 +12,7 @@ void free_registers(registers_t *register_stack){
 }
 
 registers_t *register_stack(char *header){
-    registers_t *new_reg = malloc(sizeof(registers_t));
+    registers_t *new_reg = (registers_t *) malloc(sizeof(registers_t));
     assert(new_reg != NULL);
 
     new_reg->head = NULL;
@@ -87,10 +82,10 @@ int allocate(registers_t *register_stack, char *id){
 
 
 reg_t* _allocate(){
-    reg_t* new_reg = malloc(sizeof(reg_t));
+    reg_t* new_reg = (reg_t *) malloc(sizeof(reg_t));
     assert(new_reg != NULL);
     
-    new_reg->id = "";
+    new_reg->id = NULL; 
     new_reg->reg_number = -1;
     return new_reg;
 }
@@ -134,7 +129,7 @@ int reg_test(){
 
 char *get_name_by_reg_num(registers_t *reg_stack, int id){
     reg_t *node = reg_stack->head;
-    while (node && head->reg_number != id){
+    while (node && node->reg_number != id){
         node = node->next;
     }
 
@@ -142,3 +137,4 @@ char *get_name_by_reg_num(registers_t *reg_stack, int id){
     assert(node != NULL);
     return node->id;
 }
+

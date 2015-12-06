@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "codegen.h"
+#include "instruction.h"
 #include "register.h"
 
 // typechecking
@@ -14,8 +15,9 @@
         1; \
 })
 
-FILE *output_file = NULL; 
 int scope_level;
+FILE *output_file = NULL;
+registers_t *registers = NULL;
 
 /* Registers
  *  Create a register stack: registers_t *register_stack()
@@ -24,20 +26,14 @@ int scope_level;
  *  Free registers           void free_registers(registers_t *)
  */
 
-registers_t *registers = NULL;
-
-
-
-void MOV(int src, int dst){
-    // given src, dest
-    char *src_id = get_name_by_reg_num(registers, src);
-    char *dst_id = get_name_by_reg_num(registers, dst);
-
-    print("MOV %s, %s\n", src_id, dst_id);
-}
 
 int genCode(node *ast){
     assert(ast != NULL);
+
+    if (registers == NULL){
+        registers = register_stack("test");
+    }
+
 
     #ifndef DEBUG
     if (!output_file){
@@ -49,15 +45,13 @@ int genCode(node *ast){
     }
     #endif 
 
-    if (registers == NULL){
-        // Get a new register
-        registers = register_stack();
-    }
-
     int kind = ast->kind;
     int scope;
     int left, right;
     int next_reg, reg_number, this_reg, src_reg;
+
+    test_print();
+    return 0;
 
     switch (kind){
         case PROGRAM:
@@ -153,46 +147,12 @@ int genCode(node *ast){
         case SEMICOLEN_STATEMENT:
             // nothing to do here
             return -1;
-        case
-        case
-        case
-        case
-        case
-        case
-        case
-        case
-        case
-        case
-        case
-        case
-        case
-        case
-        case
-        case
-        case
-        case
-        case
+        case TYPE_EXPRESSION_NODE:
+            // type(arguments_opt)
+            // first get the argument list
+            break;
     }
 
     return kind;
 }
 
-void print(const char *fmt, ...){
-    va_list arg;
-
-    va_start (arg, fmt);
-    #ifdef DEBUG
-    vfprintf (stdout, fmt, arg);
-    #else
-    vfprintf (output_file, fmt, arg);
-    #endif
-    va_end (arg);
-}
-
-
-
-/*
-int main(){
-    print("This is a test %d\n", 0);
-}
-*/
