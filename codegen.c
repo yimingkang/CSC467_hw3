@@ -6,6 +6,14 @@
 #include "codegen.h"
 #include "register.h"
 
+// typechecking
+#define typecheck(type,x) \
+({      type __dummy; \
+        typeof(x) __dummy2; \
+        (void)(&__dummy == &__dummy2); \
+        1; \
+})
+
 FILE *output_file = NULL; 
 int scope_level;
 
@@ -17,6 +25,16 @@ int scope_level;
  */
 
 registers_t *registers = NULL;
+
+
+
+void MOV(int src, int dst){
+    // given src, dest
+    char *src_id = get_name_by_reg_num(registers, src);
+    char *dst_id = get_name_by_reg_num(registers, dst);
+
+    print("MOV %s, %s\n", src_id, dst_id);
+}
 
 int genCode(node *ast){
     assert(ast != NULL);
@@ -39,7 +57,7 @@ int genCode(node *ast){
     int kind = ast->kind;
     int scope;
     int left, right;
-    int reg_number, next_reg;
+    int next_reg, reg_number, this_reg, src_reg;
 
     switch (kind){
         case PROGRAM:
@@ -74,15 +92,81 @@ int genCode(node *ast){
             break;
         case INITIALIZED_DECLARATION:
             // allocate register
-            allocate(registers, ast->initialized_declaration.id);
+            this_reg = allocate(registers, ast->initialized_declaration.id);
             print("TEMP %s\n", ast->initialized_declaration.id);
 
             next_reg = next_alloc(registers);
             // get the tmp results first
-            reg_number = genCode(ast->initialized_declaration.expression);
+            src_reg = genCode(ast->initialized_declaration.expression);
+
+            // mov
+            MOV(src_reg, this_reg);
+            
+            // deallocate the tmps
             dealloc(registers, next_reg);
-            print("MOV %s\n", ast->declaration.id);
             break;
+        case CONST_DECLARATION:
+            // allocate register
+            this_reg = allocate(registers, ast->const_declaration.id);
+            print("TEMP %s\n", ast->const_declaration.id);
+
+            next_reg = next_alloc(registers);
+            // get the tmp results first
+            src_reg = genCode(ast->const_declaration.expression);
+
+            // mov
+            MOV(src_reg, this_reg);
+            
+            // deallocate the tmps
+            dealloc(registers, next_reg);
+            break;
+        case ASSIGNMENT_STATEMENT:
+            
+            this_reg = genCode(ast->assignment_statement.variable); 
+
+            // to assgin, reg must exists
+            assert(this_reg != -1);
+            next_reg = next_alloc(registers);
+
+            // get the tmp results first
+            src_reg = genCode(ast->assignment_statement.expression);
+            // move result into this_reg
+            MOV(src_reg, this_reg);
+
+            // deallocate the tmps
+            dealloc(registers, next_reg);
+            break;
+        case IF_ELSE_STATEMENT:
+            // TODO: this is tricky, do later
+            break;
+        case IF_STATEMENT:
+            // TODO: this is tricky, do later
+            break;
+        case SCOPE_STATEMENT:
+            // first note the next scope
+            next_reg = next_alloc(registers);
+            genCode(ast->scope_statement.scope);
+
+            // deallocate all registers in the scope
+            dealloc(registers, next_reg);
+            break;
+        case SEMICOLEN_STATEMENT:
+            // nothing to do here
+            return -1;
+        case
+        case
+        case
+        case
+        case
+        case
+        case
+        case
+        case
+        case
+        case
+        case
+        case
+        case
         case
         case
         case
