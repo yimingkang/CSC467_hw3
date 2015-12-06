@@ -16,6 +16,8 @@
 })
 
 int scope_level;
+
+// extern vars init
 FILE *output_file = NULL;
 registers_t *registers = NULL;
 
@@ -48,10 +50,11 @@ int genCode(node *ast){
     int kind = ast->kind;
     int scope;
     int left, right;
-    int next_reg, reg_number, this_reg, src_reg;
+    int next_reg, reg_number, this_reg, src_reg, func_name;
+    char *this_reg_name;
 
-    test_print();
-    return 0;
+    //test_print();
+    //return 0;
 
     switch (kind){
         case PROGRAM:
@@ -82,12 +85,12 @@ int genCode(node *ast){
         case DECLARATION:
             // allocate register
             allocate(registers, ast->declaration.id);
-            print("TEMP %s\n", ast->declaration.id);
+            print("PARAM %s\n", ast->declaration.id);
             break;
         case INITIALIZED_DECLARATION:
             // allocate register
             this_reg = allocate(registers, ast->initialized_declaration.id);
-            print("TEMP %s\n", ast->initialized_declaration.id);
+            print("PARAM %s\n", ast->initialized_declaration.id);
 
             next_reg = next_alloc(registers);
             // get the tmp results first
@@ -102,7 +105,7 @@ int genCode(node *ast){
         case CONST_DECLARATION:
             // allocate register
             this_reg = allocate(registers, ast->const_declaration.id);
-            print("TEMP %s\n", ast->const_declaration.id);
+            print("PARAM %s\n", ast->const_declaration.id);
 
             next_reg = next_alloc(registers);
             // get the tmp results first
@@ -149,10 +152,56 @@ int genCode(node *ast){
             return -1;
         case TYPE_EXPRESSION_NODE:
             // type(arguments_opt)
-            // first get the argument list
+            next_reg = next_alloc(registers);
+
+            // allocate a register 
+            this_reg_name = tempVar(next_reg);
+            this_reg = allocate(registers, this_reg_name);
+            print("TEMP %s = {", this_reg_name);
+            
+            // recursively print all the arguments
+            genCode(ast->type_expression_node.arguments_opt);
+            print("};\n");
             break;
+        case FUNC_EXPRESSION_NODE:
+            func_name = ast->func_expression_node.func_name;
+            if (func_name == 0){
+
+            } else if (func_name == 1){
+
+            }else if (func_name == 2){
+
+            }else{
+                // bad
+                assert(0);
+            }
+
+            // no return value
+            return -1;
+        case BINARY_EXPRESSION_NODE:
+
+        case :    
+        case :    
+        case :    
+        case :    
+        case :    
+        case :    
+        case :    
+        case :    
+        case :    
+        case :    
+        case :    
+        case :    
     }
 
     return kind;
 }
 
+char *tempVar(int idx){
+    // number of bytes we need is:
+    // 7 for tempVar
+    // idx/10 + 1 for integer
+    // extra 1 for \0
+    char *result = (char *) malloc( 7 + idx/10 + 1 + 1);
+    sprintf(result, "tempVar%d", idx);
+}

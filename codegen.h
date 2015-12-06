@@ -6,5 +6,6 @@
 
 int genCode(node *ast);
 void print(const char *, ...);
+char *tempVar(int);
 
 #endif
