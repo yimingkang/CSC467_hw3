@@ -94,10 +94,13 @@ int main (int argc, char *argv[]) {
 /* Phase 4: Add code to call the code generation routine */
 /* TODO: call your code generation routine here */
  
-  if (errorOccurred)
+  if (errorOccurred){
     fprintf(outputFile,"Failed to compile\n");
-  else 
-    genCode(ast);
+  } else {
+      gen_param param;
+      init_gen_param(&param);
+    genCode(ast, param);
+ }
 /***********************************************************************
  * Post Compilation Cleanup
  **********************************************************************/

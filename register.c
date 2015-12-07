@@ -55,29 +55,26 @@ void _recursive_free(reg_t *node){
 
 reg_t *find_node(registers_t *register_stack, char *id){
     reg_t *head = register_stack->head;
-    while (head && strcmp(id, head->id) != 0){
+    while (head && strcmp(id, head->sb_id) != 0){
         head = head->next;
     }
     return head;
 }
 
-int find(registers_t *register_stack, char *id){
-    reg_t *head = find_node(register_stack, id);
-    if (head){
-        return head->reg_number;
-    }
-    return -1;
+reg_t* find(registers_t *register_stack, char *id){
+    return find_node(register_stack, id);
 }
 
-int allocate(registers_t *register_stack, char *id){
+reg_t* allocate(registers_t *register_stack, char *id, int scope){
     reg_t *new_reg = _allocate();
-    new_reg->id = id;
+    new_reg->sb_id = id;
     new_reg->reg_number = register_stack->size;
+    new_reg->scope = scope;
     register_stack->size++;
     reg_t* next_node = register_stack->head;
     register_stack->head = new_reg;
     new_reg->next = next_node;
-    return new_reg->reg_number;
+    return new_reg;
 }
 
 
@@ -85,7 +82,7 @@ reg_t* _allocate(){
     reg_t* new_reg = (reg_t *) malloc(sizeof(reg_t));
     assert(new_reg != NULL);
     
-    new_reg->id = NULL; 
+    new_reg->sb_id= NULL; 
     new_reg->reg_number = -1;
     return new_reg;
 }
@@ -93,7 +90,7 @@ reg_t* _allocate(){
 void print_registers(registers_t* reg_stack){
     reg_t *node = reg_stack->head;
     while (node){
-        printf("%s|", node->id);
+        printf("%s|", node->sb_id);
         node = node->next;
     }
     puts("");
@@ -102,13 +99,13 @@ void print_registers(registers_t* reg_stack){
 int reg_test(){
     registers_t *new_regs = register_stack("mystack");
     int i, reg_number;
-    reg_number = allocate(new_regs, "R100");
-    reg_number = allocate(new_regs, "R99");
-    reg_number = allocate(new_regs, "R98");
+    reg_number = allocate(new_regs, "R100",0);
+    reg_number = allocate(new_regs, "R99",0);
+    reg_number = allocate(new_regs, "R98",0);
     for (i = 0; i < 20; i++){
-        reg_number = allocate(new_regs, "R1");
+        reg_number = allocate(new_regs, "R1",0);
         printf("Register number is %d\n", reg_number);
-        reg_number = allocate(new_regs, "R2");
+        reg_number = allocate(new_regs, "R2",0);
         printf("Register number is %d\n", reg_number);
     }
     print_registers(new_regs);
@@ -135,6 +132,6 @@ char *get_name_by_reg_num(registers_t *reg_stack, int id){
 
     // Not found ---> this is bad
     assert(node != NULL);
-    return node->id;
+    return node->sb_id;
 }
 
