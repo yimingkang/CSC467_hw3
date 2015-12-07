@@ -1,29 +1,42 @@
-CSC467 Lab3
+CSC467 Lab4
 =================================================
 Student 1: Yiming Kang
-Student #:
+Student #: 998676730
+    - register.c, instructions.c, testing, some of codegen.c
 
 Student 2: TianYu Li
 Student #: 999107149
+    - most of codegen.c, testing
 
-Approach to AST and structure:
-AST is built using bison parser. As bison parsers the streams of tokens using a LL(1) parser, which is bottoms up parser, we allocate the AST node and give it a node_type based on the type of the rule matched. 
-For example, one of the grammer rule for non-terminal "expression" is a single CONSTANT INT token. When this rule is matched, we call ast_allocate to create an ast node forthe constant int literal. ast_allocate takes a enum node_type, and a number of additional arguments depending on the type of node. For constant int literal, the second argument is type, which in this case is INT, and third is a numeric value of type int. Using bison parser conventions, the value of the token or terminals or non-teriminals indicated in the parser rule is referenced sequentially by $1, $2 and so on. $$ is the variable we assign to to propagate up the recursive parse tree, in this case we assign the new node.
-The data structure for the AST node is as follows. The main data structure is struct node, representing every node in the AST. node has a property enum node_type indicating the type of the node, for example can be LITERAL_EXPRESSION_NODE, ASSIGNMENT_STATEMENT etc. Then is union of structs for the data properties of different types of nodes. The struct will include property of the current node, for example in LITERAL_EXPRESSION_NODE contains the acutal value and the data type; or in the case of ASSIGNMENT_STATMENT pointers to other nodes. In this case of ASSIGNMENT_STATEMENT, points to a variable node and an expression node. This referencing comes from the natural grammar for the assignment statement, and this forms the AST tree.
-For rules such as statements
-statements:
-: statements statement
-|
-we create propagate up NULL value, and in "statements statement" we create a node where one property stores the value of "statements" and the other store the value of "statement". This forms a tree of statements
-          scope.statements
-            |
-          statements node -> statement
-            |
-          statements node -> statement
-            |
-          null
+Approach:  
+We generate the assembly code by traversing AST constructed in the previous lab. Actions to take at each node is defined in `codegen.c::genCode()` which uses `register.c` to track and allocate/deallocate registers to variables. `instruction.c` is used to generate various instructions given src and dest registers.
 
-Approach to semantic checking
-yyparse() generates a AST where the head node is store at global variable ast.
-Then we build the symbol table.
+Implementation detail:
+register.c:
+    - Registers are allocated on a stack, each register will be assigned a unique ID
+    - Registers are deallocated by calling dealloc(int pos) where every register allocated after pos will be reused in the future
+    - Position of the next register number is saved before entering a new scope, registers including and after it can be safetly reused when the scope exits.
 
+Challenges:  
+:TODO:
+
+Testing:  
+All test cases are located in ./tests/lab4_test/ which contains the following test cases. `make && make test` to run all tests
+
+if_else.frag:
+    - tests whether code generator outputs the correct assembly to handle if-else statement  
+nested_if.frag:
+    - tests nested if with variables of the same name declared in scope, wheter registers are reused  
+ops.frag:  
+    - tests whether arithmetic and logical operations are produced correctly  
+expression.frag:  
+    - tests whether expressions are generated correctly including precedence and tmpVar reuse  
+general_test.frag:  
+    - general variable creation  
+    - assignment  
+    - binary operators (both arithmetic and logical)  
+    - unary operators (both arithmetic and logical)  
+shader.frag, phong.frag:   
+    - demo code, compiled code should run and render expected images  
+invalid*.frag:  
+    - invalid code (syntax or semantics error), this should not compile  
